@@ -1,21 +1,65 @@
 import React from 'react';
 import {
+  Alert,
   Image,
+  Button,
+  FlatList,
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
+  TouchableHighlight,
   View,
+  TextInput,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
 
+class TodoItem extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      done: false
+    };
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+      //console.log('update showDone', nextProps.showDone)
+  }
+
+  render() {
+    if (!this.state.done || this.props.showDone)
+      return (
+        <View style={{ flexDirection: 'row'}}>
+          <Switch value={this.state.done} onValueChange={(value) => this.setState({done: value})} />
+          <Text style={styles.item}>{this.props.item.key}</Text>
+        </View>
+      )
+    else
+      return (<View/>)
+  }
+}
+
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: '',
+      words: [],
+      showDone: false
+    };
+  }
+
+  updateShowDone() {
+
+  }
 
   render() {
     return (
@@ -32,18 +76,50 @@ export default class HomeScreen extends React.Component {
             />
           </View>
 
+          <View style={styles.textInputContainer}>
+            <TextInput
+               value={this.state.text}
+               style={{height: 60, borderWidth: 1, borderColor: '#7e7e7e'}}
+               placeholder="Type here to translate!"
+               onChangeText={(text) => this.setState({text: text})}
+             />
+
+
+             <Button
+              onPress={() => {
+                this.setState(previousState => {
+                  return {
+                    words: previousState.text ?
+                      [{key: previousState.text}].concat(previousState.words) :
+                      previousState.words,
+                    text: ''
+                  }
+                });
+                // Alert.alert('You tapped the button!');
+              }}
+              title="Add note"
+            />
+          <Button
+            onPress={() => {
+              this.setState(previousState => {
+                console.log('toggle done', previousState.showDone);
+                return {showDone: !previousState.showDone};
+              });
+            }}
+            title={this.state.showDone ? "Hide done" : "Show done"}/>
+
+          {
+            this.state.words.map(item => <TodoItem key={item.key} item={item} showDone={this.state.showDone} />)
+          }
+
+          </View>
+
           <View style={styles.getStartedContainer}>
             {this._maybeRenderDevelopmentModeWarning()}
-
-            <Text style={styles.getStartedText}>Get started by opening</Text>
 
             <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
               <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
             </View>
-
-            <Text style={styles.getStartedText}>
-              Change this text and your app will automatically reload.
-            </Text>
           </View>
 
           <View style={styles.helpContainer}>
@@ -129,6 +205,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 50,
   },
+  textInputContainer: {
+    padding: 10,
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+  },
   homeScreenFilename: {
     marginVertical: 7,
   },
@@ -183,6 +267,6 @@ const styles = StyleSheet.create({
   },
   helpLinkText: {
     fontSize: 14,
-    color: '#2e78b7',
+    color: '#2e78b8',
   },
 });
