@@ -7,6 +7,8 @@ import NewListScreen from '../screens/NewListScreen';
 import ListsScreen from '../screens/ListsScreen';
 import AboutScreen from '../screens/AboutScreen';
 
+import Colors from '../constants/Colors';
+
 const NewListStack = createStackNavigator({
   New: NewListScreen,
 });
@@ -57,4 +59,13 @@ export default createBottomTabNavigator({
   NewListStack,
   // ListsStack,
   AboutStack,
+}, {
+    tabBarOptions: {
+        showLabel: true, // hide labels
+        activeTintColor: Colors.logoMainColor, // active icon color
+        inactiveTintColor: Colors.tabIconDefault,  // inactive icon color
+        style: {
+            backgroundColor: Colors.tabBar // TabBar background
+        }
+    }
 });

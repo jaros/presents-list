@@ -12,7 +12,7 @@ import {
   TextInput,
 } from 'react-native';
 import { WebBrowser } from 'expo';
-
+import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
 import { MonoText } from '../components/StyledText';
 
@@ -47,8 +47,8 @@ export default class NewListScreen extends React.Component {
             <Image
               source={
                 __DEV__
-                  ? require('../assets/images/icon1.png')
-                  : require('../assets/images/icon.png')
+                  ? require('../assets/images/icon_trans.png')
+                  : require('../assets/images/icon_trans.png')
               }
               style={styles.welcomeImage}
             />
@@ -59,7 +59,7 @@ export default class NewListScreen extends React.Component {
             <View style={{ flexDirection: 'row'}}>
               <TextInput
                  value={this.state.text}
-                 style={{height: 60, borderWidth: 1, borderColor: '#7e7e7e', textAlign: 'center', flexGrow: 1}}
+                 style={{height: 60, borderWidth: 1, borderColor: Colors.logoLightColor, textAlign: 'center', flexGrow: 1}}
                  placeholder="Type here to add item!"
                  onChangeText={(text) => this.setState({text: text})}
                />
@@ -84,6 +84,7 @@ export default class NewListScreen extends React.Component {
             </View>
 
           <Button
+            color={Colors.logoMainColor}
             onPress={() => {
               this.setState(previousState => {
                 console.log('toggle done', previousState.showDone);
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
     marginBottom: 20,
-    backgroundColor: '#a4d792',
+    // backgroundColor: Colors.logoLightColor,
   },
   welcomeImage: {
     width: 100,
@@ -136,10 +137,15 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     height: 60,
     alignItems: 'center',
-    backgroundColor: '#2196F3'
+    borderColor: Colors.logoLightColor,
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    backgroundColor: Colors.logoLightColor,
   },
   buttonText: {
     padding: 20,
-    color: 'white'
+    // fontFamily: "Expletus Sans",
+    fontWeight: '500',
+    color: Colors.logoText
   },
 });

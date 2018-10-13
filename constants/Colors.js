@@ -1,4 +1,4 @@
-const tintColor = '#2f95dc';
+const tintColor = '#7cbe81';
 
 export default {
   tintColor,
@@ -12,6 +12,6 @@ export default {
   noticeBackground: tintColor,
   noticeText: '#fff',
   logoText: '#424141',
-  logoMainColor: '#21825c',
+  logoMainColor: '#7cbe81',
   logoLightColor: '#a4d792'
 };
