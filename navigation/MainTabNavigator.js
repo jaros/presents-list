@@ -3,15 +3,15 @@ import { Platform } from 'react-native';
 import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
-import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import NewListScreen from '../screens/NewListScreen';
+import ListsScreen from '../screens/ListsScreen';
+import AboutScreen from '../screens/AboutScreen';
 
-const HomeStack = createStackNavigator({
-  Home: HomeScreen,
+const NewListStack = createStackNavigator({
+  New: NewListScreen,
 });
 
-HomeStack.navigationOptions = {
+NewListStack.navigationOptions = {
   tabBarLabel: 'New',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
@@ -25,11 +25,11 @@ HomeStack.navigationOptions = {
   ),
 };
 
-const LinksStack = createStackNavigator({
-  Links: LinksScreen,
+const ListsStack = createStackNavigator({
+  Lists: ListsScreen,
 });
 
-LinksStack.navigationOptions = {
+ListsStack.navigationOptions = {
   tabBarLabel: 'Lists',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
@@ -39,11 +39,11 @@ LinksStack.navigationOptions = {
   ),
 };
 
-const SettingsStack = createStackNavigator({
-  Settings: SettingsScreen,
+const AboutStack = createStackNavigator({
+  About: AboutScreen,
 });
 
-SettingsStack.navigationOptions = {
+AboutStack.navigationOptions = {
   tabBarLabel: 'About',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
@@ -54,7 +54,7 @@ SettingsStack.navigationOptions = {
 };
 
 export default createBottomTabNavigator({
-  HomeStack,
-  LinksStack,
-  SettingsStack,
+  NewListStack,
+  ListsStack,
+  AboutStack,
 });

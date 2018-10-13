@@ -18,7 +18,7 @@ import { WebBrowser } from 'expo';
 import TodoItem from '../components/TodoItem';
 import { MonoText } from '../components/StyledText';
 
-export default class HomeScreen extends React.Component {
+export default class NewListScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };
@@ -103,15 +103,10 @@ export default class HomeScreen extends React.Component {
                 />
             )
           }
-
           </View>
 
           <View style={styles.getStartedContainer}>
             {this._maybeRenderDevelopmentModeWarning()}
-
-            <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-              <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
-            </View>
           </View>
         </ScrollView>
 
