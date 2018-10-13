@@ -95,7 +95,11 @@ export default class NewListScreen extends React.Component {
 
         </View>
 
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
+          keyboardDismissMode='on-drag'
+          >
 
           <View style={styles.listContainer}>
 
