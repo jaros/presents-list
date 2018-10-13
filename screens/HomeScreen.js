@@ -70,35 +70,38 @@ export default class HomeScreen extends React.Component {
               source={
                 __DEV__
                   ? require('../assets/images/robot-dev.png')
-                  : require('../assets/images/robot-prod.png')
+                  : require('../assets/images/todo-logo.png')
               }
               style={styles.welcomeImage}
             />
           </View>
 
           <View style={styles.textInputContainer}>
-            <TextInput
-               value={this.state.text}
-               style={{height: 60, borderWidth: 1, borderColor: '#7e7e7e'}}
-               placeholder="Type here to translate!"
-               onChangeText={(text) => this.setState({text: text})}
-             />
 
+            <View style={{ flexDirection: 'row'}}>
+              <TextInput
+                 value={this.state.text}
+                 style={{height: 60, borderWidth: 1, borderColor: '#7e7e7e', textAlign: 'center', flexGrow: 1}}
+                 placeholder="Type here to add item!"
+                 onChangeText={(text) => this.setState({text: text})}
+               />
+             <TouchableHighlight onPress={() => {
+               this.setState(previousState => {
+                 return {
+                   words: previousState.text ?
+                     [{key: previousState.text}].concat(previousState.words) :
+                     previousState.words,
+                   text: ''
+                 }
+               });
+               // Alert.alert('You tapped the button!');
+             }} underlayColor="white">
+                 <View style={styles.button}>
+                    <Text style={styles.buttonText}>Add note</Text>
+                  </View>
+               </TouchableHighlight>
+            </View>
 
-             <Button
-              onPress={() => {
-                this.setState(previousState => {
-                  return {
-                    words: previousState.text ?
-                      [{key: previousState.text}].concat(previousState.words) :
-                      previousState.words,
-                    text: ''
-                  }
-                });
-                // Alert.alert('You tapped the button!');
-              }}
-              title="Add note"
-            />
           <Button
             onPress={() => {
               this.setState(previousState => {
@@ -129,13 +132,6 @@ export default class HomeScreen extends React.Component {
           </View>
         </ScrollView>
 
-        <View style={styles.tabBarInfoContainer}>
-          <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-            <MonoText style={styles.codeHighlightText}>navigation/MainTabNavigator.js</MonoText>
-          </View>
-        </View>
       </View>
     );
   }
@@ -212,6 +208,16 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 18,
     height: 44,
+  },
+  button: {
+    marginBottom: 30,
+    height: 60,
+    alignItems: 'center',
+    backgroundColor: '#2196F3'
+  },
+  buttonText: {
+    padding: 20,
+    color: 'white'
   },
   homeScreenFilename: {
     marginVertical: 7,
