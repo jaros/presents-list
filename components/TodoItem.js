@@ -48,14 +48,15 @@ export default class TodoItem extends React.Component {
           }
 
           <Text style={ this.textStyle() }>{this.props.item.text}</Text>
-          <TouchableHighlight
-            onPress={() => {
-              console.log('delete a note', this.props.item.key);
-              this.props.onDelete(this.props.item.key);
-            }}
-            underlayColor="white">
-            <Ionicons name="ios-close-circle-outline" size={44} color="red" />
-          </TouchableHighlight>
+
+        <View style={{width: 44}}>
+          <ActionIcon icon='ios-close-circle-outline' click={() => {
+            console.log('delete a note', this.props.item.key);
+            this.props.onDelete(this.props.item.key);
+          }}
+          color='red'/>
+        </View>
+
 
         </View>
       )
@@ -68,8 +69,9 @@ const styles = StyleSheet.create({
   item: {
     padding: 10,
     fontSize: 18,
-    height: 44,
+    minHeight: 44,
     flexGrow: 1,
+    flexWrap: 'wrap',
   },
   done: {
     color: '#d9d9d9',
