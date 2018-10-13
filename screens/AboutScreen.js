@@ -1,6 +1,7 @@
 import React from 'react';
 import { WebBrowser } from 'expo';
 import { View, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
@@ -19,7 +20,8 @@ export default class SettingsScreen extends React.Component {
           WebBrowser.openBrowserAsync('https://github.com/jaros/presents-list')
           }
         } style={{fontSize: 18, color: '#2e78b8', textAlign: 'center', padding: 20}}>
-        Feel free to check and contribute
+        Feel free to check and contribute &nbsp;
+        <Ionicons name='logo-github' size={24} />
       </Text>
       </View>
     </View>;
