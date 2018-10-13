@@ -27,7 +27,7 @@ export default class NewListScreen extends React.Component {
     super(props);
     this.state = {
       text: '',
-      words: [],
+      items: [],
       showDone: true
     };
   }
@@ -36,7 +36,7 @@ export default class NewListScreen extends React.Component {
     console.log('deleteting item...', key)
     this.setState(previousState => {
       return {
-        words: previousState.words.filter(item => item.key !== key)
+        items: previousState.items.filter(item => item.key !== key)
       }
     });
   };
@@ -68,12 +68,12 @@ export default class NewListScreen extends React.Component {
              <TouchableHighlight onPress={() => {
                this.setState(previousState => {
                  return {
-                   words: previousState.text ?
+                   items: previousState.text ?
                      [{
                        key: new Date().getTime(),
                        text: previousState.text
-                     }].concat(previousState.words) :
-                     previousState.words,
+                     }].concat(previousState.items) :
+                     previousState.items,
                    text: ''
                  }
                });
@@ -95,7 +95,7 @@ export default class NewListScreen extends React.Component {
             title={this.state.showDone ? "Hide done" : "Show done"}/>
 
           {
-            this.state.words.map((item) =>
+            this.state.items.map((item) =>
               <TodoItem key={item.key}
                 item={item}
                 showDone={this.state.showDone}
