@@ -2,6 +2,18 @@ import React from 'react';
 import { Text, View, Switch, TouchableHighlight, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+class ActionIcon extends React.Component {
+  render() {
+    return (
+    <TouchableHighlight
+      onPress={this.props.click}
+      underlayColor="white">
+      <Ionicons name={this.props.icon} size={44} color={this.props.color} />
+    </TouchableHighlight>
+    )
+  }
+}
+
 export default class TodoItem extends React.Component {
   constructor(props) {
     super(props);
@@ -14,11 +26,23 @@ export default class TodoItem extends React.Component {
       //console.log('update showDone', nextProps.showDone)
   }
 
+  toggleDone = () => {
+      this.setState(previousState => {
+        return {done: !previousState.done}
+      })
+  }
+
   render() {
     if (!this.state.done || this.props.showDone)
       return (
         <View style={{ flexDirection: 'row', alignItems: 'center'}}>
-          <Switch value={this.state.done} onValueChange={(value) => this.setState({done: value})} />
+          {
+            this.state.done && <ActionIcon icon='ios-checkbox-outline' color='green' click={this.toggleDone}/>
+          }
+          {
+            !this.state.done && <ActionIcon icon='ios-square-outline' color='grey' click={this.toggleDone}/>
+          }
+
           <Text style={styles.item}>{this.props.item.text}</Text>
           <TouchableHighlight
             onPress={() => {

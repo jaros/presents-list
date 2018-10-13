@@ -28,7 +28,7 @@ export default class NewListScreen extends React.Component {
     this.state = {
       text: '',
       words: [],
-      showDone: false
+      showDone: true
     };
   }
 
