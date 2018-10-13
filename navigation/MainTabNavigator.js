@@ -55,6 +55,6 @@ AboutStack.navigationOptions = {
 
 export default createBottomTabNavigator({
   NewListStack,
-  ListsStack,
+  // ListsStack,
   AboutStack,
 });
