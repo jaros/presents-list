@@ -43,7 +43,7 @@ export default class NewListScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+        <View style={styles.contentContainer}>
           <View style={styles.welcomeContainer}>
             <Image
               source={
@@ -56,37 +56,35 @@ export default class NewListScreen extends React.Component {
           </View>
 
           <View style={styles.textInputContainer}>
-
-            <View style={{ flexDirection: 'row'}}>
-              <TextInput
-                 ref={this.textInput}
-                 value={this.state.text}
-                 clearButtonMode='while-editing'
-                 autoFocus={true}
-                 style={{height: 60, borderWidth: 1, borderColor: Colors.logoLightColor, textAlign: 'center', flexGrow: 1}}
-                 placeholder="Type here to add item!"
-                 onChangeText={(text) => this.setState({text: text})}
-               />
-             <TouchableHighlight onPress={() => {
-               this.setState(previousState => {
-                 return {
-                   items: previousState.text ?
-                     [{
-                       key: new Date().getTime(),
-                       text: previousState.text
-                     }].concat(previousState.items) :
-                     previousState.items,
-                   text: ''
-                 }
-               });
-               this.textInput.current.focus();
-               // Alert.alert('You tapped the button!');
-             }} underlayColor="white">
-                 <View style={styles.button}>
-                    <Text style={styles.buttonText}>Add note</Text>
-                  </View>
-               </TouchableHighlight>
-            </View>
+            <TextInput
+               ref={this.textInput}
+               value={this.state.text}
+               clearButtonMode='while-editing'
+               autoFocus={true}
+               style={{height: 60, borderWidth: 1, borderColor: Colors.logoLightColor, textAlign: 'center', flexGrow: 1}}
+               placeholder="Type here to add item!"
+               onChangeText={(text) => this.setState({text: text})}
+             />
+           <TouchableHighlight onPress={() => {
+             this.setState(previousState => {
+               return {
+                 items: previousState.text ?
+                   [{
+                     key: new Date().getTime(),
+                     text: previousState.text
+                   }].concat(previousState.items) :
+                   previousState.items,
+                 text: ''
+               }
+             });
+             this.textInput.current.focus();
+             // Alert.alert('You tapped the button!');
+           }} underlayColor="white">
+               <View style={styles.button}>
+                  <Text style={styles.buttonText}>Add note</Text>
+                </View>
+             </TouchableHighlight>
+          </View>
 
           <Button
             color={Colors.logoMainColor}
@@ -97,6 +95,12 @@ export default class NewListScreen extends React.Component {
               });
             }}
             title={this.state.showDone ? "Hide done" : "Show done"}/>
+
+        </View>
+
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+
+          <View style={styles.listContainer}>
 
           {
             this.state.items.map((item) =>
@@ -135,8 +139,12 @@ const styles = StyleSheet.create({
     marginTop: 3,
     marginLeft: -10,
   },
+  listContainer: {
+    padding: 10,
+  },
   textInputContainer: {
     padding: 10,
+    flexDirection: 'row',
   },
   button: {
     marginBottom: 30,
