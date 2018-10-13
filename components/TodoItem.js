@@ -8,7 +8,7 @@ class ActionIcon extends React.Component {
     <TouchableHighlight
       onPress={this.props.click}
       underlayColor="white">
-      <Ionicons name={this.props.icon} size={44} color={this.props.color} />
+      <Ionicons name={this.props.icon} size={44} color={this.props.color || styles.itemColor} />
     </TouchableHighlight>
     )
   }
@@ -32,18 +32,22 @@ export default class TodoItem extends React.Component {
       })
   }
 
+  textStyle() {
+    return this.state.done ? [styles.item, styles.done] : [styles.item, styles.itemColor];
+  }
+
   render() {
     if (!this.state.done || this.props.showDone)
       return (
         <View style={{ flexDirection: 'row', alignItems: 'center'}}>
           {
-            this.state.done && <ActionIcon icon='ios-checkbox-outline' color='green' click={this.toggleDone}/>
+            this.state.done && <ActionIcon icon='ios-checkbox-outline' click={this.toggleDone} color='#d9d9d9'/>
           }
           {
-            !this.state.done && <ActionIcon icon='ios-square-outline' color='grey' click={this.toggleDone}/>
+            !this.state.done && <ActionIcon icon='ios-square-outline' click={this.toggleDone}/>
           }
 
-          <Text style={styles.item}>{this.props.item.text}</Text>
+          <Text style={ this.textStyle() }>{this.props.item.text}</Text>
           <TouchableHighlight
             onPress={() => {
               console.log('delete a note', this.props.item.key);
@@ -67,4 +71,12 @@ const styles = StyleSheet.create({
     height: 44,
     flexGrow: 1,
   },
+  done: {
+    color: '#d9d9d9',
+	  textDecorationLine: 'line-through',
+    fontStyle: 'italic',
+  },
+  itemColor: {
+    color: '#383636'
+  }
 });
