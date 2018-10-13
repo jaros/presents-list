@@ -14,6 +14,7 @@ import {
   View,
   TextInput,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { WebBrowser } from 'expo';
 
 import { MonoText } from '../components/StyledText';
@@ -33,9 +34,18 @@ class TodoItem extends React.Component {
   render() {
     if (!this.state.done || this.props.showDone)
       return (
-        <View style={{ flexDirection: 'row'}}>
+        <View style={{ flexDirection: 'row', alignItems: 'center'}}>
           <Switch value={this.state.done} onValueChange={(value) => this.setState({done: value})} />
-          <Text style={styles.item}>{this.props.item.key}</Text>
+          <Text style={styles.item}>{this.props.item.text}</Text>
+          <TouchableHighlight
+            onPress={() => {
+              console.log('delete a note', this.props.item.key);
+              this.props.onDelete(this.props.item.key);
+            }}
+            underlayColor="white">
+            <Ionicons name="ios-close-circle-outline" size={32} color="red" />
+          </TouchableHighlight>
+
         </View>
       )
     else
@@ -57,9 +67,14 @@ export default class HomeScreen extends React.Component {
     };
   }
 
-  updateShowDone() {
-
-  }
+  deleteItem = (key) => {
+    console.log('deleteting item...', key)
+    this.setState(previousState => {
+      return {
+        words: previousState.words.filter(item => item.key !== key)
+      }
+    });
+  };
 
   render() {
     return (
@@ -89,7 +104,10 @@ export default class HomeScreen extends React.Component {
                this.setState(previousState => {
                  return {
                    words: previousState.text ?
-                     [{key: previousState.text}].concat(previousState.words) :
+                     [{
+                       key: new Date().getTime(),
+                       text: previousState.text
+                     }].concat(previousState.words) :
                      previousState.words,
                    text: ''
                  }
@@ -112,7 +130,13 @@ export default class HomeScreen extends React.Component {
             title={this.state.showDone ? "Hide done" : "Show done"}/>
 
           {
-            this.state.words.map(item => <TodoItem key={item.key} item={item} showDone={this.state.showDone} />)
+            this.state.words.map((item, index) =>
+              <TodoItem key={index}
+                item={item}
+                showDone={this.state.showDone}
+                onDelete={this.deleteItem}
+                />
+            )
           }
 
           </View>
@@ -123,12 +147,6 @@ export default class HomeScreen extends React.Component {
             <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
               <MonoText style={styles.codeHighlightText}>screens/HomeScreen.js</MonoText>
             </View>
-          </View>
-
-          <View style={styles.helpContainer}>
-            <TouchableOpacity onPress={this._handleHelpPress} style={styles.helpLink}>
-              <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-            </TouchableOpacity>
           </View>
         </ScrollView>
 
@@ -208,6 +226,7 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 18,
     height: 44,
+    flexGrow: 1,
   },
   button: {
     marginBottom: 30,
