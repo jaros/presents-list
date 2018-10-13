@@ -47,7 +47,7 @@ export default class NewListScreen extends React.Component {
             <Image
               source={
                 __DEV__
-                  ? require('../assets/images/robot-dev.png')
+                  ? require('../assets/images/icon1.png')
                   : require('../assets/images/icon.png')
               }
               style={styles.welcomeImage}
@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
     marginBottom: 20,
+    backgroundColor: '#a4d792',
   },
   welcomeImage: {
     width: 100,

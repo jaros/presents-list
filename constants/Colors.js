@@ -11,4 +11,7 @@ export default {
   warningText: '#666804',
   noticeBackground: tintColor,
   noticeText: '#fff',
+  logoText: '#424141',
+  logoMainColor: '#21825c',
+  logoLightColor: '#a4d792'
 };
