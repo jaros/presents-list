@@ -23,6 +23,7 @@ export default class NewListScreen extends React.Component {
 
   constructor(props) {
     super(props);
+    this.textInput = React.createRef();
     this.state = {
       text: '',
       items: [],
@@ -47,7 +48,7 @@ export default class NewListScreen extends React.Component {
             <Image
               source={
                 __DEV__
-                  ? require('../assets/images/icon_trans.png')
+                  ? require('../assets/images/icon.png')
                   : require('../assets/images/icon_trans.png')
               }
               style={styles.welcomeImage}
@@ -58,7 +59,10 @@ export default class NewListScreen extends React.Component {
 
             <View style={{ flexDirection: 'row'}}>
               <TextInput
+                 ref={this.textInput}
                  value={this.state.text}
+                 clearButtonMode='while-editing'
+                 autoFocus={true}
                  style={{height: 60, borderWidth: 1, borderColor: Colors.logoLightColor, textAlign: 'center', flexGrow: 1}}
                  placeholder="Type here to add item!"
                  onChangeText={(text) => this.setState({text: text})}
@@ -75,6 +79,7 @@ export default class NewListScreen extends React.Component {
                    text: ''
                  }
                });
+               this.textInput.current.focus();
                // Alert.alert('You tapped the button!');
              }} underlayColor="white">
                  <View style={styles.button}>
