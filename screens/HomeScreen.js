@@ -95,8 +95,8 @@ export default class HomeScreen extends React.Component {
             title={this.state.showDone ? "Hide done" : "Show done"}/>
 
           {
-            this.state.words.map((item, index) =>
-              <TodoItem key={index}
+            this.state.words.map((item) =>
+              <TodoItem key={item.key}
                 item={item}
                 showDone={this.state.showDone}
                 onDelete={this.deleteItem}
