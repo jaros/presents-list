@@ -26,7 +26,7 @@ export default class NewListScreen extends React.Component {
     super(props);
     this.state = {
       text: '',
-      items: Array.from({length: 30}).map((_, i) => {return {key: i, text: i}}),
+      items: [],
       showDone: true,
       scrollY: new Animated.Value(0),
     };

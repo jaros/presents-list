@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "PresentsList",
-    "description": "a todo list",
-    "slug": "PresentsList",
+    "name": "Check List",
+    "description": "a list for everything you can imagine",
+    "slug": "CheckList",
     "privacy": "public",
     "sdkVersion": "30.0.0",
     "platforms": [
@@ -24,7 +24,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jaros.checklist"
     }
   }
 }
