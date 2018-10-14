@@ -132,7 +132,7 @@ export default class NewListScreen extends React.Component {
 }
 
 const HEADER_MAX_HEIGHT = 290;
-const HEADER_MIN_HEIGHT = 135;
+const HEADER_MIN_HEIGHT = 100;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
 const styles = StyleSheet.create({
@@ -155,15 +155,17 @@ const styles = StyleSheet.create({
   },
   welcomeContainer: {
     alignItems: 'center',
+    minHeight: 50,
+    height: '30%',
     marginTop: 40,
     marginBottom: 20,
-    // backgroundColor: Colors.logoLightColor,
   },
   welcomeImage: {
-    //width: 'auto',
-    height: 80,
+    minHeight: 50,
+    height: '100%',
     resizeMode: 'contain',
     marginTop: 3,
+    marginBottom: 5,
     marginLeft: -10,
   },
   listContainer: {
