@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Animated,
   Image,
   Button,
   Platform,
@@ -25,8 +26,9 @@ export default class NewListScreen extends React.Component {
     super(props);
     this.state = {
       text: '',
-      items: [],
-      showDone: true
+      items: Array.from({length: 30}).map((_, i) => {return {key: i, text: i}}),
+      showDone: true,
+      scrollY: new Animated.Value(0),
     };
   }
 
@@ -40,9 +42,38 @@ export default class NewListScreen extends React.Component {
   };
 
   render() {
+    const headerHeight = this.state.scrollY.interpolate({
+      inputRange: [0, HEADER_SCROLL_DISTANCE],
+      outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+      extrapolate: 'clamp',
+    });
+
     return (
       <View style={styles.container}>
-        <View style={styles.contentContainer}>
+        <ScrollView
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+           [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
+         )}
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
+          keyboardDismissMode='on-drag'
+          >
+
+          <View style={styles.listContainer}>
+
+          {
+            this.state.items.map((item) =>
+              <TodoItem key={item.key}
+                item={item}
+                showDone={this.state.showDone}
+                onDelete={this.deleteItem}
+                />
+            )
+          }
+          </View>
+        </ScrollView>
+        <Animated.View style={[styles.header, {height: headerHeight}]}>
           <View style={styles.welcomeContainer}>
             <Image
               source={
@@ -93,31 +124,16 @@ export default class NewListScreen extends React.Component {
             }}
             title={this.state.showDone ? "Hide done" : "Show done"}/>
 
-        </View>
+        </Animated.View>
 
-        <ScrollView
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}
-          keyboardDismissMode='on-drag'
-          >
-
-          <View style={styles.listContainer}>
-
-          {
-            this.state.items.map((item) =>
-              <TodoItem key={item.key}
-                item={item}
-                showDone={this.state.showDone}
-                onDelete={this.deleteItem}
-                />
-            )
-          }
-          </View>
-        </ScrollView>
       </View>
     );
   }
 }
+
+const HEADER_MAX_HEIGHT = 290;
+const HEADER_MIN_HEIGHT = 135;
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
 const styles = StyleSheet.create({
   container: {
@@ -127,26 +143,37 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingTop: 30,
   },
+  header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: Colors.tabBar,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.tabIconDefault,
+    overflow: 'hidden',
+  },
   welcomeContainer: {
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 40,
     marginBottom: 20,
     // backgroundColor: Colors.logoLightColor,
   },
   welcomeImage: {
-    width: 100,
+    //width: 'auto',
     height: 80,
     resizeMode: 'contain',
     marginTop: 3,
     marginLeft: -10,
   },
   listContainer: {
+    marginTop: HEADER_MAX_HEIGHT,
     padding: 10,
   },
   textInputContainer: {
     padding: 10,
     flexDirection: 'row',
-    width: '90%',
+    // width: '90%',
     flexWrap:'nowrap'
   },
   textInputField: {
