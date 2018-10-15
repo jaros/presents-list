@@ -86,14 +86,23 @@ export default class NewListScreen extends React.Component {
           </View>
 
           <View style={styles.textInputContainer}>
-            <TextInput
-               value={this.state.text}
-               clearButtonMode='while-editing'
-               autoFocus={true}
-               style={styles.textInputField}
-               placeholder="Type here to add item!"
-               onChangeText={(text) => this.setState({text: text})}
-             />
+            <View style={{
+                flexDirection: 'row',
+                height: 60,
+                width: 60,
+                flexGrow: 1,
+                borderWidth: 1,
+                borderColor: Colors.logoLightColor,
+              }}>
+              <TextInput
+                 value={this.state.text}
+                 clearButtonMode='while-editing'
+                 autoFocus={true}
+                 style={styles.textInputField}
+                 placeholder="Type here to add item!"
+                 onChangeText={(text) => this.setState({text: text})}
+               />
+            </View>
            <TouchableHighlight onPress={() => {
              this.setState(previousState => {
                return {
@@ -170,18 +179,21 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     marginTop: HEADER_MAX_HEIGHT,
-    padding: 10,
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 10,
+    paddingTop: 10,
   },
   textInputContainer: {
-    padding: 10,
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 10,
+    paddingTop: 10,
     flexDirection: 'row',
     // width: '90%',
     flexWrap:'nowrap'
   },
   textInputField: {
-    height: 60,
-    borderWidth: 1,
-    borderColor: Colors.logoLightColor,
     textAlign: 'center',
     flexGrow: 1
   },

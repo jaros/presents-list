@@ -47,17 +47,20 @@ export default class TodoItem extends React.Component {
             !this.state.done && <ActionIcon icon='ios-square-outline' click={this.toggleDone}/>
           }
 
-          <Text style={ this.textStyle() }>{this.props.item.text}</Text>
+          <View style={{
+            flexDirection: 'row',
+            //height: 60,
+            width: 60,
+            flexGrow: 1,
+            }}>
+            <Text style={ this.textStyle() }>{this.props.item.text}</Text>
+          </View>
 
-        <View style={{width: 44}}>
           <ActionIcon icon='ios-close-circle-outline' click={() => {
             console.log('delete a note', this.props.item.key);
             this.props.onDelete(this.props.item.key);
           }}
           color='red'/>
-        </View>
-
-
         </View>
       )
     else
