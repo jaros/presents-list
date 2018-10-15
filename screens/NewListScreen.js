@@ -51,6 +51,7 @@ export default class NewListScreen extends React.Component {
     return (
       <View style={styles.container}>
         <ScrollView
+          showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
           onScroll={Animated.event(
            [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
