@@ -134,6 +134,19 @@ export default class NewListScreen extends React.Component {
                 />
             )
           }
+
+          {
+            (this.state.items.filter(it => it.done) || []).length !== 0 &&
+            <Button
+              color={Colors.logoMainColor}
+              onPress={() => {
+                this.setState(previousState => {
+                  console.log('toggle done', previousState.showDone);
+                  return {showDone: !previousState.showDone};
+                });
+              }}
+              title={this.state.showDone ? "Hide done" : "Show done"}/>
+          }
           </View>
         </ScrollView>
         <Animated.View style={[styles.header, {height: headerHeight}]}>
@@ -166,23 +179,12 @@ export default class NewListScreen extends React.Component {
                  onChangeText={(text) => this.setState({text: text})}
                />
             </View>
-           <TouchableHighlight onPress={this.addItem} underlayColor="white">
+           <TouchableHighlight onPress={this.addItem} underlayColor="white" style={styles.buttonWrapper}>
                <View style={styles.button}>
                   <Text style={styles.buttonText}>Add note</Text>
                 </View>
              </TouchableHighlight>
           </View>
-
-          <Button
-            color={Colors.logoMainColor}
-            onPress={() => {
-              this.setState(previousState => {
-                console.log('toggle done', previousState.showDone);
-                return {showDone: !previousState.showDone};
-              });
-            }}
-            title={this.state.showDone ? "Hide done" : "Show done"}/>
-
         </Animated.View>
 
       </View>
@@ -190,7 +192,7 @@ export default class NewListScreen extends React.Component {
   }
 }
 
-const HEADER_MAX_HEIGHT = 290;
+const HEADER_MAX_HEIGHT = 210;
 const HEADER_MIN_HEIGHT = 100;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
@@ -215,14 +217,16 @@ const styles = StyleSheet.create({
   welcomeContainer: {
     alignItems: 'center',
     minHeight: 50,
-    height: '30%',
+    height: '35%',
     marginTop: 40,
     marginBottom: 20,
+    // backgroundColor: 'green',
   },
   welcomeImage: {
     minHeight: 50,
     height: '100%',
     resizeMode: 'contain',
+    // backgroundColor: 'skyblue',
     marginTop: 3,
     marginBottom: 5,
     marginLeft: -10,
@@ -238,7 +242,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 10,
-    paddingTop: 10,
+    //paddingTop: 10,
     flexDirection: 'row',
     // width: '90%',
     flexWrap:'nowrap'
@@ -246,6 +250,9 @@ const styles = StyleSheet.create({
   textInputField: {
     textAlign: 'center',
     flexGrow: 1
+  },
+  buttonWrapper: {
+    height: 60,
   },
   button: {
     marginBottom: 30,
