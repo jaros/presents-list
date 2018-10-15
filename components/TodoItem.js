@@ -18,7 +18,7 @@ export default class TodoItem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      done: false
+      done: this.props.item.done
     };
   }
 
@@ -29,6 +29,8 @@ export default class TodoItem extends React.Component {
   toggleDone = () => {
       this.setState(previousState => {
         return {done: !previousState.done}
+      }, () => {
+        this.props.onDone(this.props.item.key, this.state.done);
       })
   }
 

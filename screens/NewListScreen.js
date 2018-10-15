@@ -16,6 +16,7 @@ import { WebBrowser } from 'expo';
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
 import { MonoText } from '../components/StyledText';
+import { AsyncStorage } from "react-native"
 
 export default class NewListScreen extends React.Component {
   static navigationOptions = {
@@ -30,7 +31,25 @@ export default class NewListScreen extends React.Component {
       showDone: true,
       scrollY: new Animated.Value(0),
     };
+    this.loadStoredItems();
   }
+
+  loadStoredItems = () => {
+      AsyncStorage.getItem('TODO_ITEMS').then(value => {
+        if (value) {
+          // We have data!!
+          console.log("got items from DB", value);
+          this.setState({
+            items: JSON.parse(value)
+          });
+        }
+      }).catch(err => console.log(err));
+  };
+
+  storeItems = () => {
+    AsyncStorage.setItem('TODO_ITEMS', JSON.stringify(this.state.items));
+  };
+
 
   deleteItem = (key) => {
     console.log('deleteting item...', key)
@@ -38,7 +57,49 @@ export default class NewListScreen extends React.Component {
       return {
         items: previousState.items.filter(item => item.key !== key)
       }
+    }, this.storeItems);
+  };
+
+  toggleItem = (key, isDone) => {
+    console.log('toggle ...', key)
+    this.setState(previousState => {
+      return {
+        items: previousState.items.map(item => {
+          if (item.key === key) {
+            item.done = isDone;
+          }
+          return item;
+        })
+      }
+    }, this.storeItems);
+  };
+
+  addItem = () => {
+    if (this.state.text) {
+      this.setState(previousState => {
+        return {
+          items: [{
+              key: new Date().getTime(),
+              text: previousState.text
+            }]
+            .concat(previousState.items),
+          text: ''
+        }
+      }, this.storeItems);
+    }
+
+    this.setState(previousState => {
+      return {
+        items: previousState.text ?
+          [{
+            key: new Date().getTime(),
+            text: previousState.text
+          }].concat(previousState.items) :
+          previousState.items,
+        text: ''
+      }
     });
+    // Alert.alert('You tapped the button!');
   };
 
   render() {
@@ -69,6 +130,7 @@ export default class NewListScreen extends React.Component {
                 item={item}
                 showDone={this.state.showDone}
                 onDelete={this.deleteItem}
+                onDone={this.toggleItem}
                 />
             )
           }
@@ -104,20 +166,7 @@ export default class NewListScreen extends React.Component {
                  onChangeText={(text) => this.setState({text: text})}
                />
             </View>
-           <TouchableHighlight onPress={() => {
-             this.setState(previousState => {
-               return {
-                 items: previousState.text ?
-                   [{
-                     key: new Date().getTime(),
-                     text: previousState.text
-                   }].concat(previousState.items) :
-                   previousState.items,
-                 text: ''
-               }
-             });
-             // Alert.alert('You tapped the button!');
-           }} underlayColor="white">
+           <TouchableHighlight onPress={this.addItem} underlayColor="white">
                <View style={styles.button}>
                   <Text style={styles.buttonText}>Add note</Text>
                 </View>
