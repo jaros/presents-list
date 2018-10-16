@@ -14,13 +14,13 @@ const NewListStack = createStackNavigator({
 });
 
 NewListStack.navigationOptions = {
-  tabBarLabel: 'New',
+  tabBarLabel: 'My list',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
       name={
         Platform.OS === 'ios'
-          ? `ios-add-circle${focused ? '' : '-outline'}`
+          ? 'ios-list'
           : 'list-bullet'
       }
     />
