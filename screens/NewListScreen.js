@@ -147,10 +147,11 @@ export default class NewListScreen extends React.Component {
           <View style={styles.listContainer}>
 
           {
-            this.state.items.map((item) =>
+            this.state.items
+            .filter(item => !item.done || this.state.showDone)
+            .map(item =>
               <TodoItem key={item.key}
                 item={item}
-                showDone={this.state.showDone}
                 onDelete={this.deleteItem}
                 onDone={this.toggleItem}
                 />

@@ -22,10 +22,6 @@ export default class TodoItem extends React.Component {
     };
   }
 
-  componentWillUpdate(nextProps, nextState) {
-      //console.log('update showDone', nextProps.showDone)
-  }
-
   toggleDone = () => {
       this.setState(previousState => {
         return {done: !previousState.done}
@@ -39,34 +35,31 @@ export default class TodoItem extends React.Component {
   }
 
   render() {
-    if (!this.state.done || this.props.showDone)
-      return (
-        <View style={{ flexDirection: 'row', alignItems: 'center'}}>
-          {
-            this.state.done && <ActionIcon icon='ios-checkbox-outline' click={this.toggleDone} color='#d9d9d9'/>
-          }
-          {
-            !this.state.done && <ActionIcon icon='ios-square-outline' click={this.toggleDone}/>
-          }
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+        {
+          this.state.done && <ActionIcon icon='ios-checkbox-outline' click={this.toggleDone} color='#d9d9d9'/>
+        }
+        {
+          !this.state.done && <ActionIcon icon='ios-square-outline' click={this.toggleDone}/>
+        }
 
-          <View style={{
-            flexDirection: 'row',
-            //height: 60,
-            width: 60,
-            flexGrow: 1,
-            }}>
-            <Text style={ this.textStyle() }>{this.props.item.text}</Text>
-          </View>
-
-          <ActionIcon icon='ios-close-circle-outline' click={() => {
-            console.log('delete a note', this.props.item.key);
-            this.props.onDelete(this.props.item.key);
-          }}
-          color='red'/>
+        <View style={{
+          flexDirection: 'row',
+          //height: 60,
+          width: 60,
+          flexGrow: 1,
+          }}>
+          <Text style={ this.textStyle() }>{this.props.item.text}</Text>
         </View>
-      )
-    else
-      return (<View/>)
+
+        <ActionIcon icon='ios-close-circle-outline' click={() => {
+          console.log('delete a note', this.props.item.key);
+          this.props.onDelete(this.props.item.key);
+        }}
+        color='red'/>
+      </View>
+    )
   }
 }
 
