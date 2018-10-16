@@ -32,6 +32,7 @@ export default class NewListScreen extends React.Component {
       scrollY: new Animated.Value(0),
     };
     this.loadStoredItems();
+    this.loadPreferences();
   }
 
   loadStoredItems = () => {
@@ -46,10 +47,31 @@ export default class NewListScreen extends React.Component {
       }).catch(err => console.log(err));
   };
 
+  loadPreferences = () => {
+      AsyncStorage.getItem('TODO_SHOW_DONE').then(value => {
+        if (value) {
+          // We have data!!
+          console.log("got showDone from DB", value);
+          this.setState({
+            showDone: JSON.parse(value)
+          });
+        }
+      }).catch(err => console.log(err));
+  };
+
   storeItems = () => {
     AsyncStorage.setItem('TODO_ITEMS', JSON.stringify(this.state.items));
   };
 
+  storePreferences = () => {
+    AsyncStorage.setItem('TODO_SHOW_DONE', JSON.stringify(this.state.showDone));
+  };
+
+  toggleShowDoneItems = () => {
+    this.setState(previousState => {
+      return {showDone: !previousState.showDone};
+    }, this.storePreferences);
+  };
 
   deleteItem = (key) => {
     console.log('deleteting item...', key)
@@ -139,12 +161,7 @@ export default class NewListScreen extends React.Component {
             (this.state.items.filter(it => it.done) || []).length !== 0 &&
             <Button
               color={Colors.logoMainColor}
-              onPress={() => {
-                this.setState(previousState => {
-                  console.log('toggle done', previousState.showDone);
-                  return {showDone: !previousState.showDone};
-                });
-              }}
+              onPress={this.toggleShowDoneItems}
               title={this.state.showDone ? "Hide done" : "Show done"}/>
           }
           </View>
