@@ -15,14 +15,14 @@ export default class SettingsScreen extends React.Component {
 
       <View>
       <Text style={{fontSize: 24, color: '#788087', textAlign: 'center'}}>
-        This is open source TODO list
+        This is an open-source TODO list
       </Text>
 
       <Text onPress={() => {
           WebBrowser.openBrowserAsync('https://github.com/jaros/presents-list')
           }
         } style={{fontSize: 18, color: Colors.logoLightColor, textAlign: 'center', padding: 20}}>
-        Feel free to check and contribute &nbsp;
+        You’re welcome to contribute &nbsp;
         <Ionicons name='logo-github' size={24} />
       </Text>
       </View>
