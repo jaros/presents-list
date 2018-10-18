@@ -11,6 +11,7 @@ import {
   TouchableHighlight,
   View,
   TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 import Colors from '../constants/Colors';
@@ -125,20 +126,21 @@ export default class NewListScreen extends React.Component {
   };
 
   render() {
-    const headerHeight = this.state.scrollY.interpolate({
-      inputRange: [0, HEADER_SCROLL_DISTANCE],
-      outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
-      extrapolate: 'clamp',
-    });
+    // const headerHeight = this.state.scrollY.interpolate({
+    //   inputRange: [0, HEADER_SCROLL_DISTANCE],
+    //   outputRange: [HEADER_MIN_HEIGHT, HEADER_MAX_HEIGHT],
+    //   extrapolate: 'clamp',
+    // });
 
     return (
+      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
       <View style={styles.container}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
-          onScroll={Animated.event(
-           [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
-         )}
+         //  onScroll={Animated.event(
+         //   [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
+         // )}
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
           keyboardDismissMode='on-drag'
@@ -167,18 +169,7 @@ export default class NewListScreen extends React.Component {
           }
           </View>
         </ScrollView>
-        <Animated.View style={[styles.header, {height: headerHeight}]}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/icon.png')
-                  : require('../assets/images/icon_trans.png')
-              }
-              style={styles.welcomeImage}
-            />
-          </View>
-
+        <Animated.View style={[styles.header]}>
           <View style={styles.textInputContainer}>
             <View style={{
                 flexDirection: 'row',
@@ -206,11 +197,12 @@ export default class NewListScreen extends React.Component {
         </Animated.View>
 
       </View>
+      </KeyboardAvoidingView>
     );
   }
 }
 
-const HEADER_MAX_HEIGHT = 210;
+const HEADER_MAX_HEIGHT = 200;
 const HEADER_MIN_HEIGHT = 100;
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
@@ -224,33 +216,17 @@ const styles = StyleSheet.create({
   },
   header: {
     position: 'absolute',
-    top: 0,
+    bottom: 0,
     left: 0,
     right: 0,
+    height: 195,
     backgroundColor: Colors.tabBar,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.tabIconDefault,
+    borderTopWidth: 1,
+    borderTopColor: Colors.tabIconDefault,
     overflow: 'hidden',
   },
-  welcomeContainer: {
-    alignItems: 'center',
-    minHeight: 50,
-    height: '35%',
-    marginTop: 40,
-    marginBottom: 20,
-    // backgroundColor: 'green',
-  },
-  welcomeImage: {
-    minHeight: 50,
-    height: '100%',
-    resizeMode: 'contain',
-    // backgroundColor: 'skyblue',
-    marginTop: 3,
-    marginBottom: 5,
-    marginLeft: -10,
-  },
   listContainer: {
-    marginTop: HEADER_MAX_HEIGHT,
+    marginBottom: HEADER_MAX_HEIGHT,
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 10,
@@ -259,7 +235,8 @@ const styles = StyleSheet.create({
   textInputContainer: {
     paddingLeft: 15,
     paddingRight: 15,
-    paddingBottom: 10,
+    //paddingBottom: 10,
+    paddingTop: 20,
     //paddingTop: 10,
     flexDirection: 'row',
     // width: '90%',
