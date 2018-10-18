@@ -205,7 +205,6 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   header: {
-    paddingBottom: 30,
     backgroundColor: Colors.tabBar,
     borderTopWidth: 1,
     borderTopColor: Colors.tabIconDefault,
@@ -220,11 +219,9 @@ const styles = StyleSheet.create({
   textInputContainer: {
     paddingLeft: 15,
     paddingRight: 15,
-    //paddingBottom: 10,
     paddingTop: 20,
-    //paddingTop: 10,
+    paddingBottom: 30,
     flexDirection: 'row',
-    // width: '90%',
     flexWrap:'nowrap'
   },
   textInputField: {
