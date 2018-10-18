@@ -127,7 +127,7 @@ export default class NewListScreen extends React.Component {
         style={styles.container}
         behavior="padding"
         enabled
-        keyboardVerticalOffset={Header.HEIGHT + 20}
+        keyboardVerticalOffset={Header.HEIGHT + 35}
         >
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -192,10 +192,6 @@ export default class NewListScreen extends React.Component {
   }
 }
 
-const HEADER_MAX_HEIGHT = 200;
-const HEADER_MIN_HEIGHT = 100;
-const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -210,17 +206,13 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.tabIconDefault,
   },
   listContainer: {
-    marginBottom: HEADER_MAX_HEIGHT,
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 10,
     paddingTop: 10,
   },
   textInputContainer: {
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingTop: 20,
-    paddingBottom: 30,
+    padding: 15,
     flexDirection: 'row',
     flexWrap:'nowrap'
   },
