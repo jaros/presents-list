@@ -18,6 +18,7 @@ import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
 import { MonoText } from '../components/StyledText';
 import { AsyncStorage } from "react-native"
+import { Header } from 'react-navigation';
 
 export default class NewListScreen extends React.Component {
   static navigationOptions = {
@@ -39,8 +40,6 @@ export default class NewListScreen extends React.Component {
   loadStoredItems = () => {
       AsyncStorage.getItem('TODO_ITEMS').then(value => {
         if (value) {
-          // We have data!!
-          console.log("got items from DB", value);
           this.setState({
             items: JSON.parse(value)
           });
@@ -51,8 +50,6 @@ export default class NewListScreen extends React.Component {
   loadPreferences = () => {
       AsyncStorage.getItem('TODO_SHOW_DONE').then(value => {
         if (value) {
-          // We have data!!
-          console.log("got showDone from DB", value);
           this.setState({
             showDone: JSON.parse(value)
           });
@@ -84,7 +81,6 @@ export default class NewListScreen extends React.Component {
   };
 
   toggleItem = (key, isDone) => {
-    console.log('toggle ...', key)
     this.setState(previousState => {
       return {
         items: previousState.items.map(item => {
@@ -126,21 +122,16 @@ export default class NewListScreen extends React.Component {
   };
 
   render() {
-    // const headerHeight = this.state.scrollY.interpolate({
-    //   inputRange: [0, HEADER_SCROLL_DISTANCE],
-    //   outputRange: [HEADER_MIN_HEIGHT, HEADER_MAX_HEIGHT],
-    //   extrapolate: 'clamp',
-    // });
-
     return (
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior="padding"
+        enabled
+        keyboardVerticalOffset={Header.HEIGHT + 20}
+        >
         <ScrollView
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
-         //  onScroll={Animated.event(
-         //   [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
-         // )}
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
           keyboardDismissMode='on-drag'
@@ -169,7 +160,7 @@ export default class NewListScreen extends React.Component {
           }
           </View>
         </ScrollView>
-        <Animated.View style={[styles.header]}>
+        <View style={[styles.header]}>
           <View style={styles.textInputContainer}>
             <View style={{
                 flexDirection: 'row',
@@ -194,9 +185,8 @@ export default class NewListScreen extends React.Component {
                 </View>
              </TouchableHighlight>
           </View>
-        </Animated.View>
 
-      </View>
+        </View>
       </KeyboardAvoidingView>
     );
   }
@@ -215,15 +205,10 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   header: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 195,
+    paddingBottom: 30,
     backgroundColor: Colors.tabBar,
     borderTopWidth: 1,
     borderTopColor: Colors.tabIconDefault,
-    overflow: 'hidden',
   },
   listContainer: {
     marginBottom: HEADER_MAX_HEIGHT,
