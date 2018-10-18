@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import { createStackNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
 import NewListScreen from '../screens/NewListScreen';
@@ -55,16 +55,24 @@ AboutStack.navigationOptions = {
   ),
 };
 
-export default createBottomTabNavigator({
+export default createMaterialTopTabNavigator({
   NewListStack,
   // ListsStack,
   AboutStack,
 }, {
+    // tabBarPosition: 'bottom',
+    swipeEnabled: true,
+    animationEnabled: true,
     tabBarOptions: {
-        showLabel: true, // hide labels
+        showLabel: true,
+        showIcon: true,
         activeTintColor: Colors.logoMainColor, // active icon color
         inactiveTintColor: Colors.tabIconDefault,  // inactive icon color
+        indicatorStyle: {
+          backgroundColor: Colors.logoMainColor,
+        },
         style: {
+            paddingTop: 30,
             backgroundColor: Colors.tabBar // TabBar background
         }
     }

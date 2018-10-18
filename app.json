@@ -6,9 +6,9 @@
     "privacy": "public",
     "sdkVersion": "30.0.0",
     "platforms": [
-      "ios",
-      "android"
+      "ios"
     ],
+    "githubUrl": "https://github.com/jaros/check-list",
     "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
