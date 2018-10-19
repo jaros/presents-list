@@ -65,7 +65,7 @@ export default createMaterialTopTabNavigator({
     animationEnabled: true,
     tabBarOptions: {
         showLabel: true,
-        showIcon: true,
+        showIcon: false,
         activeTintColor: Colors.logoMainColor, // active icon color
         inactiveTintColor: Colors.tabIconDefault,  // inactive icon color
         indicatorStyle: {
