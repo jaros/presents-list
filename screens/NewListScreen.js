@@ -20,6 +20,8 @@ import { MonoText } from '../components/StyledText';
 import { AsyncStorage } from "react-native"
 import { Header } from 'react-navigation';
 
+import SegmentedControlTab from 'react-native-segmented-control-tab';
+
 export default class NewListScreen extends React.Component {
   static navigationOptions = {
     header: null,
@@ -31,6 +33,7 @@ export default class NewListScreen extends React.Component {
       text: '',
       items: [],
       showDone: true,
+      selectedIndex: 0,
       scrollY: new Animated.Value(0),
     };
     this.loadStoredItems();
@@ -121,6 +124,13 @@ export default class NewListScreen extends React.Component {
     // Alert.alert('You tapped the button!');
   };
 
+  handleIndexChange = (index) => {
+    this.setState({
+      ...this.state,
+      selectedIndex: index,
+    });
+  }
+
   render() {
     return (
       <KeyboardAvoidingView
@@ -129,6 +139,24 @@ export default class NewListScreen extends React.Component {
         enabled
         keyboardVerticalOffset={Header.HEIGHT + 35}
         >
+
+        <View style={{paddingTop: 10, paddingLeft: 5, paddingRight: 5}}>
+        <SegmentedControlTab
+          values={['One', 'Two', 'Three', 'Four', 'Five', 'Six']}
+          selectedIndex={this.state.selectedIndex}
+          onTabPress={this.handleIndexChange}
+          activeTabStyle={{
+            backgroundColor: Colors.logoLightColor
+          }}
+          tabStyle={{
+            borderColor: Colors.logoMainColor
+          }}
+          tabTextStyle={{
+            color: Colors.logoMainColor
+          }}
+        />
+        </View>
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
