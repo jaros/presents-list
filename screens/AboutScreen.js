@@ -6,7 +6,7 @@ import Colors from '../constants/Colors';
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
-    title: 'About',
+    header: null,
   };
 
   render() {

@@ -34,10 +34,24 @@ export default class NewListScreen extends React.Component {
       items: [],
       showDone: true,
       selectedIndex: 0,
+      currentListId: 1,
       scrollY: new Animated.Value(0),
     };
     this.loadStoredItems();
     this.loadPreferences();
+
+    const willFocusSubscription = this.props.navigation.addListener(
+      'willFocus',
+      payload => {
+        console.debug('willFocus', payload);
+        const params = payload.action.params;
+        if (params && params.listId) {
+          this.setState({
+            currentListId: params.listId
+          });
+        }
+      }
+    );
   }
 
   loadStoredItems = () => {
@@ -141,6 +155,9 @@ export default class NewListScreen extends React.Component {
         >
 
         <View style={{paddingTop: 10, paddingLeft: 5, paddingRight: 5}}>
+
+        <Text>List id: {this.state.currentListId}</Text>
+
         <SegmentedControlTab
           values={['One', 'Two', 'Three', 'Four', 'Five', 'Six']}
           selectedIndex={this.state.selectedIndex}

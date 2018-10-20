@@ -56,10 +56,11 @@ AboutStack.navigationOptions = {
 };
 
 export default createMaterialTopTabNavigator({
+  ListsStack,
   NewListStack,
-  // ListsStack,
   AboutStack,
 }, {
+    initialRouteName: 'NewListStack',
     // tabBarPosition: 'bottom',
     swipeEnabled: true,
     animationEnabled: true,
