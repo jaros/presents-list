@@ -20,7 +20,7 @@ import { MonoText } from '../components/StyledText';
 import { AsyncStorage } from "react-native"
 import { Header } from 'react-navigation';
 
-import SegmentedControlTab from 'react-native-segmented-control-tab';
+// import SegmentedControlTab from 'react-native-segmented-control-tab';
 
 export default class NewListScreen extends React.Component {
   static navigationOptions = {
@@ -43,7 +43,6 @@ export default class NewListScreen extends React.Component {
     const willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
       payload => {
-        console.debug('willFocus', payload);
         const params = payload.action.params;
         if (params && params.listId) {
           this.setState({
@@ -158,7 +157,7 @@ export default class NewListScreen extends React.Component {
 
         <Text>List id: {this.state.currentListId}</Text>
 
-        <SegmentedControlTab
+        {/* <SegmentedControlTab
           values={['One', 'Two', 'Three', 'Four', 'Five', 'Six']}
           selectedIndex={this.state.selectedIndex}
           onTabPress={this.handleIndexChange}
@@ -171,7 +170,7 @@ export default class NewListScreen extends React.Component {
           tabTextStyle={{
             color: Colors.logoMainColor
           }}
-        />
+        /> */}
         </View>
 
         <ScrollView

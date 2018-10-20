@@ -63,7 +63,6 @@ export default class SelectListsView extends React.Component {
   }
 
   _handlePressListLink = (id) => () => {
-    console.log('navigating to list id', id);
     this.props.navigation.navigate('NewListStack', { listId: id });
   };
 }
