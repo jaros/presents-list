@@ -44,17 +44,22 @@ export default class NewListScreen extends React.Component {
       'willFocus',
       payload => {
         const params = payload.action.params;
-        if (params && params.listId) {
+        if (params && params.listId && params.listId !== this.state.currentListId) {
           this.setState({
-            currentListId: params.listId
-          });
+            currentListId: params.listId,
+            items: []
+          }, this.loadStoredItems);
         }
       }
     );
   }
 
+  listKey = () => {
+    return this.state.currentListId === 1 ? 'TODO_ITEMS' : 'TODO_ITEMS_' + this.state.currentListId;
+  }
+
   loadStoredItems = () => {
-      AsyncStorage.getItem('TODO_ITEMS').then(value => {
+      AsyncStorage.getItem(this.listKey()).then(value => {
         if (value) {
           this.setState({
             items: JSON.parse(value)
@@ -74,7 +79,7 @@ export default class NewListScreen extends React.Component {
   };
 
   storeItems = () => {
-    AsyncStorage.setItem('TODO_ITEMS', JSON.stringify(this.state.items));
+    AsyncStorage.setItem(this.listKey(), JSON.stringify(this.state.items));
   };
 
   storePreferences = () => {
