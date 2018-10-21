@@ -23,10 +23,6 @@ export default class SelectListsView extends React.Component {
     };
   }
 
-  labelStyle = (link) => {
-    return link.id == this.state.active ? [styles.optionText, styles.optionsActive] : styles.optionText;
-  }
-
   render() {
     return (
       <View>
@@ -38,14 +34,14 @@ export default class SelectListsView extends React.Component {
           <Touchable
             key={link.id}
             background={Touchable.Ripple('#ccc', false)}
-            style={styles.option}
+            style={link.id == this.state.active ? styles.activeOption : styles.option}
             onPress={this._handlePressListLink(link.id)}>
             <View style={{ flexDirection: 'row' }}>
               <View style={styles.optionIconContainer}>
-                <Ionicons name="ios-list" size={22} color={link.id == this.state.active ? Colors.logoMainColor : "#ccc"} />
+                <Ionicons name="ios-list" size={22} color={link.id == this.state.active ? "#000" : "#ccc"} />
               </View>
               <View style={styles.optionTextContainer}>
-                <Text style={this.labelStyle(link)}>
+                <Text style={styles.optionText}>
                   List {link.id}
                 </Text>
               </View>
@@ -76,9 +72,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   optionsActive: {
-    color: Colors.logoMainColor,
-    fontWeight: '500',
-    textDecorationLine: 'underline'
+    backgroundColor: Colors.logoLightColor,
   },
   optionIconContainer: {
     marginRight: 9,
@@ -89,6 +83,13 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#EDEDED',
+  },
+  activeOption: {
+    backgroundColor: Colors.logoLightColor,
+    paddingHorizontal: 15,
+    paddingVertical: 15,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.logoMainColor,
   },
   optionText: {
     fontSize: 15,
