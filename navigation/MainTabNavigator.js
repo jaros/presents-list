@@ -9,12 +9,12 @@ import AboutScreen from '../screens/AboutScreen';
 
 import Colors from '../constants/Colors';
 
-const NewListStack = createStackNavigator({
+const ActiveListStack = createStackNavigator({
   New: NewListScreen,
 });
 
-NewListStack.navigationOptions = {
-  tabBarLabel: 'My list',
+ActiveListStack.navigationOptions = {
+  tabBarLabel: 'Active',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -32,7 +32,7 @@ const ListsStack = createStackNavigator({
 });
 
 ListsStack.navigationOptions = {
-  tabBarLabel: 'Lists',
+  tabBarLabel: 'My Lists',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -57,10 +57,10 @@ AboutStack.navigationOptions = {
 
 export default createMaterialTopTabNavigator({
   ListsStack,
-  NewListStack,
+  ActiveListStack,
   AboutStack,
 }, {
-    initialRouteName: 'NewListStack',
+    initialRouteName: 'ActiveListStack',
     // tabBarPosition: 'bottom',
     swipeEnabled: true,
     animationEnabled: true,

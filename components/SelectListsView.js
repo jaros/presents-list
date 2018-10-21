@@ -2,8 +2,31 @@ import React from 'react';
 import { StyleSheet, Image, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Touchable from 'react-native-platform-touchable';
+import Colors from '../constants/Colors';
 
 export default class SelectListsView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      active: 1,
+      links: [
+        {
+          id: 1
+        },
+        {
+          id: 2
+        },
+        {
+          id: 3
+        },
+    ]
+    };
+  }
+
+  labelStyle = (link) => {
+    return link.id == this.state.active ? [styles.optionText, styles.optionsActive] : styles.optionText;
+  }
+
   render() {
     return (
       <View>
@@ -11,59 +34,33 @@ export default class SelectListsView extends React.Component {
           Lists
         </Text>
 
-        <Touchable
-          style={styles.option}
-          background={Touchable.Ripple('#ccc', false)}
-          onPress={this._handlePressListLink(1)}>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={styles.optionIconContainer}>
-              <Ionicons name="ios-list" size={22} color="#ccc" />
+        {this.state.links.map(link =>
+          <Touchable
+            key={link.id}
+            background={Touchable.Ripple('#ccc', false)}
+            style={styles.option}
+            onPress={this._handlePressListLink(link.id)}>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={styles.optionIconContainer}>
+                <Ionicons name="ios-list" size={22} color={link.id == this.state.active ? Colors.logoMainColor : "#ccc"} />
+              </View>
+              <View style={styles.optionTextContainer}>
+                <Text style={this.labelStyle(link)}>
+                  List {link.id}
+                </Text>
+              </View>
             </View>
-            <View style={styles.optionTextContainer}>
-              <Text style={styles.optionText}>
-                My List
-              </Text>
-            </View>
-          </View>
-        </Touchable>
-
-        <Touchable
-          background={Touchable.Ripple('#ccc', false)}
-          style={styles.option}
-          onPress={this._handlePressListLink(2)}>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={styles.optionIconContainer}>
-              <Ionicons name="ios-list" size={22} color="#ccc" />
-            </View>
-            <View style={styles.optionTextContainer}>
-              <Text style={styles.optionText}>
-                List 2
-              </Text>
-            </View>
-          </View>
-        </Touchable>
-
-        <Touchable
-          style={styles.option}
-          background={Touchable.Ripple('#ccc', false)}
-          onPress={this._handlePressListLink(3)}>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={styles.optionIconContainer}>
-              <Ionicons name="ios-list" size={22} color="#ccc" />
-            </View>
-            <View style={styles.optionTextContainer}>
-              <Text style={styles.optionText}>
-                List 3
-              </Text>
-            </View>
-          </View>
-        </Touchable>
+          </Touchable>
+        )}
       </View>
     );
   }
 
   _handlePressListLink = (id) => () => {
-    this.props.navigation.navigate('NewListStack', { listId: id });
+    this.setState({
+      active: id
+    });
+    this.props.navigation.navigate('ActiveListStack', { listId: id });
   };
 }
 
@@ -77,6 +74,11 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     marginTop: 9,
     marginBottom: 12,
+  },
+  optionsActive: {
+    color: Colors.logoMainColor,
+    fontWeight: '500',
+    textDecorationLine: 'underline'
   },
   optionIconContainer: {
     marginRight: 9,
