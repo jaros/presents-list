@@ -12,6 +12,8 @@ import {
   View,
   TextInput,
   KeyboardAvoidingView,
+  Modal,
+  Alert,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 import Colors from '../constants/Colors';
@@ -20,7 +22,7 @@ import { MonoText } from '../components/StyledText';
 import { AsyncStorage } from "react-native"
 import { Header } from 'react-navigation';
 
-// import SegmentedControlTab from 'react-native-segmented-control-tab';
+import DoubleClick from 'react-native-double-tap';
 
 export default class NewListScreen extends React.Component {
   static navigationOptions = {
@@ -36,6 +38,7 @@ export default class NewListScreen extends React.Component {
       selectedIndex: 0,
       currentListId: 1,
       scrollY: new Animated.Value(0),
+      modalListNameVisible: false,
     };
     this.loadStoredItems();
     this.loadPreferences();
@@ -149,6 +152,10 @@ export default class NewListScreen extends React.Component {
     });
   }
 
+  showEditListName = (visible) => {
+    this.setState({modalListNameVisible: visible});
+  };
+
   render() {
     return (
       <KeyboardAvoidingView
@@ -158,9 +165,48 @@ export default class NewListScreen extends React.Component {
         keyboardVerticalOffset={Header.HEIGHT + 35}
         >
 
-        <View style={{paddingTop: 10, paddingLeft: 5, paddingRight: 5}}>
+        <View style={{paddingTop: 10}}>
 
-        <Text>List id: {this.state.currentListId}</Text>
+        <DoubleClick
+          singleTap={() => {
+            console.log("single tap");
+          }}
+          doubleTap={() => {
+            console.log("double tap");
+            this.showEditListName(true);
+          }}
+          delay={200}>
+          <View style={{height: 44, alignItems: 'center', backgroundColor: Colors.logoLightColor}}>
+            <Text style={{
+              fontSize: 18,
+              fontWeight: '500',
+              padding: 13,
+              color: Colors.logoText}}>
+                List  {this.state.currentListId}
+            </Text>
+          </View>
+        </DoubleClick>
+        <Modal
+          animationType='slide'
+          transparent={false}
+          visible={this.state.modalListNameVisible}
+          presentationStyle='pageSheet'
+          >
+          <View style={{marginTop: 22}}>
+            <View>
+              <Text>Hello World!</Text>
+
+              <Button
+                onPress={() => {
+                  this.showEditListName(false);
+                }}
+                title='Hide Modal'
+                >
+              </Button>
+            </View>
+          </View>
+        </Modal>
+
 
         {/* <SegmentedControlTab
           values={['One', 'Two', 'Three', 'Four', 'Five', 'Six']}
@@ -258,7 +304,6 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 10,
-    paddingTop: 10,
   },
   textInputContainer: {
     padding: 15,
