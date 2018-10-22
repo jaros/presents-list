@@ -11,13 +11,16 @@ export default class SelectListsView extends React.Component {
       active: 1,
       links: [
         {
-          id: 1
+          id: 1,
+          label: 'Primary list'
         },
         {
-          id: 2
+          id: 2,
+          label: 'Kids list'
         },
         {
-          id: 3
+          id: 3,
+          label: 'Food list'
         },
     ]
     };
@@ -35,14 +38,14 @@ export default class SelectListsView extends React.Component {
             key={link.id}
             background={Touchable.Ripple('#ccc', false)}
             style={link.id == this.state.active ? styles.activeOption : styles.option}
-            onPress={this._handlePressListLink(link.id)}>
+            onPress={this._handlePressListLink(link)}>
             <View style={{ flexDirection: 'row' }}>
               <View style={styles.optionIconContainer}>
                 <Ionicons name="ios-list" size={22} color={link.id == this.state.active ? "#000" : "#ccc"} />
               </View>
               <View style={styles.optionTextContainer}>
                 <Text style={styles.optionText}>
-                  List {link.id}
+                  {link.label}
                 </Text>
               </View>
             </View>
@@ -52,11 +55,11 @@ export default class SelectListsView extends React.Component {
     );
   }
 
-  _handlePressListLink = (id) => () => {
+  _handlePressListLink = (link) => () => {
     this.setState({
-      active: id
+      active: link.id
     });
-    this.props.navigation.navigate('ActiveListStack', { listId: id });
+    this.props.navigation.navigate('ActiveListStack', { list: link });
   };
 }
 

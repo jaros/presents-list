@@ -36,7 +36,7 @@ export default class NewListScreen extends React.Component {
       items: [],
       showDone: true,
       selectedIndex: 0,
-      currentListId: 1,
+      currentList: {id: 1, label: 'Primary list'},
       scrollY: new Animated.Value(0),
       modalListNameVisible: false,
     };
@@ -47,9 +47,9 @@ export default class NewListScreen extends React.Component {
       'willFocus',
       payload => {
         const params = payload.action.params;
-        if (params && params.listId && params.listId !== this.state.currentListId) {
+        if (params && params.list && params.list !== this.state.currentList) {
           this.setState({
-            currentListId: params.listId,
+            currentList: params.list,
             items: []
           }, this.loadStoredItems);
         }
@@ -58,7 +58,7 @@ export default class NewListScreen extends React.Component {
   }
 
   listKey = () => {
-    return this.state.currentListId === 1 ? 'TODO_ITEMS' : 'TODO_ITEMS_' + this.state.currentListId;
+    return this.state.currentList.id === 1 ? 'TODO_ITEMS' : 'TODO_ITEMS_' + this.state.currentList.id;
   }
 
   loadStoredItems = () => {
@@ -182,7 +182,7 @@ export default class NewListScreen extends React.Component {
               fontWeight: '500',
               padding: 13,
               color: Colors.logoText}}>
-                List  {this.state.currentListId}
+                {this.state.currentList.label}
             </Text>
           </View>
         </DoubleClick>
