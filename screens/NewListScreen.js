@@ -1,27 +1,21 @@
 import React from 'react';
 import {
   Animated,
-  Image,
   Button,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  TouchableHighlight,
   View,
-  TextInput,
   KeyboardAvoidingView,
   Modal,
   Alert,
 } from 'react-native';
-import { WebBrowser } from 'expo';
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
-import { MonoText } from '../components/StyledText';
+import TextEdit from '../components/TextEdit';
 import { AsyncStorage } from "react-native"
 import { Header } from 'react-navigation';
-
 import DoubleClick from 'react-native-double-tap';
 
 export default class NewListScreen extends React.Component {
@@ -32,7 +26,6 @@ export default class NewListScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: '',
       items: [],
       showDone: true,
       selectedIndex: 0,
@@ -117,31 +110,16 @@ export default class NewListScreen extends React.Component {
     }, this.storeItems);
   };
 
-  addItem = () => {
-    if (this.state.text) {
-      this.setState(previousState => {
-        return {
-          items: [{
-              key: new Date().getTime(),
-              text: previousState.text
-            }]
-            .concat(previousState.items),
-          text: ''
-        }
-      }, this.storeItems);
-    }
-
+  addItem = (newValue) => {
     this.setState(previousState => {
       return {
-        items: previousState.text ?
-          [{
+        items: [{
             key: new Date().getTime(),
-            text: previousState.text
-          }].concat(previousState.items) :
-          previousState.items,
-        text: ''
+            text: newValue
+          }]
+          .concat(previousState.items)
       }
-    });
+    }, this.storeItems);
     // Alert.alert('You tapped the button!');
   };
 
@@ -193,43 +171,27 @@ export default class NewListScreen extends React.Component {
           presentationStyle='pageSheet'
           >
           <View style={{marginTop: 22}}>
-            <View style={styles.textInputContainer}>
-              <View style={{
-                  flexDirection: 'row',
-                  height: 60,
-                  width: 60,
-                  flexGrow: 1,
-                  borderWidth: 1,
-                  borderColor: Colors.logoLightColor,
-                }}>
-                <TextInput
-                   value={this.state.currentList.label}
-                   clearButtonMode='while-editing'
-                   autoFocus={true}
-                   style={styles.textInputField}
-                   onChangeText={(text) => {
-                     this.setState({
-                     currentList: {
-                       id: this.state.currentList.id,
-                       label: text}
-                     });
-                     //this.showEditListName(false);
-                   }
-                   }
-                 />
-              </View>
-             <TouchableHighlight onPress={() => this.showEditListName(false)} underlayColor="white" style={styles.buttonWrapper}>
-                 <View style={styles.button}>
-                    <Text style={styles.buttonText}>Save</Text>
-                  </View>
-               </TouchableHighlight>
-            </View>
+            <TextEdit
+              onSave={(value) => {
+                this.setState(previousState => {
+                  return {
+                    currentList: {
+                      id: previousState.currentList.id,
+                      label: value
+                    }
+                  }
+                });
+                this.showEditListName(false);
+              }}
+              saveLabel='Save'
+              textInputPlaceholder='Provide a name for current list'
+            />
             <View>
               <Button
                 onPress={() => {
                   this.showEditListName(false);
                 }}
-                title='Hide Modal'
+                title='Cancel'
                 >
               </Button>
             </View>
@@ -269,31 +231,11 @@ export default class NewListScreen extends React.Component {
           </View>
         </ScrollView>
         <View style={[styles.header]}>
-          <View style={styles.textInputContainer}>
-            <View style={{
-                flexDirection: 'row',
-                height: 60,
-                width: 60,
-                flexGrow: 1,
-                borderWidth: 1,
-                borderColor: Colors.logoLightColor,
-              }}>
-              <TextInput
-                 value={this.state.text}
-                 clearButtonMode='while-editing'
-                 autoFocus={true}
-                 style={styles.textInputField}
-                 placeholder="Type here to add item!"
-                 onChangeText={(text) => this.setState({text: text})}
-               />
-            </View>
-           <TouchableHighlight onPress={this.addItem} underlayColor="white" style={styles.buttonWrapper}>
-               <View style={styles.button}>
-                  <Text style={styles.buttonText}>Add note</Text>
-                </View>
-             </TouchableHighlight>
-          </View>
-
+          <TextEdit
+            onSave={this.addItem}
+            saveLabel='Add note'
+            textInputPlaceholder='Type here to add item!'
+          />
         </View>
       </KeyboardAvoidingView>
     );
@@ -318,30 +260,5 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     paddingBottom: 10,
   },
-  textInputContainer: {
-    padding: 15,
-    flexDirection: 'row',
-    flexWrap:'nowrap'
-  },
-  textInputField: {
-    textAlign: 'center',
-    flexGrow: 1
-  },
-  buttonWrapper: {
-    height: 60,
-  },
-  button: {
-    marginBottom: 30,
-    height: 60,
-    alignItems: 'center',
-    borderColor: Colors.logoLightColor,
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    backgroundColor: Colors.logoLightColor,
-  },
-  buttonText: {
-    padding: 20,
-    fontWeight: '500',
-    color: Colors.logoText
-  },
+
 });
