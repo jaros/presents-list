@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Animated,
   Button,
   Platform,
   ScrollView,
@@ -30,7 +29,6 @@ export default class NewListScreen extends React.Component {
       showDone: true,
       selectedIndex: 0,
       currentList: {id: 1, label: 'Primary list'},
-      scrollY: new Animated.Value(0),
       modalListNameVisible: false,
     };
     this.loadStoredItems();
