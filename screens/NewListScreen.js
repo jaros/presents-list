@@ -206,22 +206,6 @@ export default class NewListScreen extends React.Component {
             </View>
           </View>
         </Modal>
-
-
-        {/* <SegmentedControlTab
-          values={['One', 'Two', 'Three', 'Four', 'Five', 'Six']}
-          selectedIndex={this.state.selectedIndex}
-          onTabPress={this.handleIndexChange}
-          activeTabStyle={{
-            backgroundColor: Colors.logoLightColor
-          }}
-          tabStyle={{
-            borderColor: Colors.logoMainColor
-          }}
-          tabTextStyle={{
-            color: Colors.logoMainColor
-          }}
-        /> */}
         </View>
 
         <ScrollView
@@ -328,7 +312,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     padding: 20,
-    // fontFamily: "Expletus Sans",
     fontWeight: '500',
     color: Colors.logoText
   },
