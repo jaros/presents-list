@@ -193,9 +193,38 @@ export default class NewListScreen extends React.Component {
           presentationStyle='pageSheet'
           >
           <View style={{marginTop: 22}}>
+            <View style={styles.textInputContainer}>
+              <View style={{
+                  flexDirection: 'row',
+                  height: 60,
+                  width: 60,
+                  flexGrow: 1,
+                  borderWidth: 1,
+                  borderColor: Colors.logoLightColor,
+                }}>
+                <TextInput
+                   value={this.state.currentList.label}
+                   clearButtonMode='while-editing'
+                   autoFocus={true}
+                   style={styles.textInputField}
+                   onChangeText={(text) => {
+                     this.setState({
+                     currentList: {
+                       id: this.state.currentList.id,
+                       label: text}
+                     });
+                     //this.showEditListName(false);
+                   }
+                   }
+                 />
+              </View>
+             <TouchableHighlight onPress={() => this.showEditListName(false)} underlayColor="white" style={styles.buttonWrapper}>
+                 <View style={styles.button}>
+                    <Text style={styles.buttonText}>Save</Text>
+                  </View>
+               </TouchableHighlight>
+            </View>
             <View>
-              <Text>Hello World!</Text>
-
               <Button
                 onPress={() => {
                   this.showEditListName(false);
