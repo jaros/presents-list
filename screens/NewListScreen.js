@@ -183,6 +183,7 @@ export default class NewListScreen extends React.Component {
                 });
                 this.showEditListName(false);
               }}
+              initValue={this.state.currentList.label}
               saveLabel='Save'
               textInputPlaceholder='Provide a name for current list'
             />
@@ -233,6 +234,7 @@ export default class NewListScreen extends React.Component {
         <View style={[styles.header]}>
           <TextEdit
             onSave={this.addItem}
+            initValue=''
             saveLabel='Add note'
             textInputPlaceholder='Type here to add item!'
           />
