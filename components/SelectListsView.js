@@ -22,8 +22,12 @@ export default class SelectListsView extends React.Component {
           id: 3,
           label: 'Food list'
         },
-    ]
+      ]
     };
+  }
+
+  loadMetaList() {
+    // 'TODO_ITEMS_META_LIST'
   }
 
   render() {
@@ -59,7 +63,21 @@ export default class SelectListsView extends React.Component {
     this.setState({
       active: link.id
     });
-    this.props.navigation.navigate('ActiveListStack', { list: link });
+    this.props.navigation.navigate('ActiveListStack',
+    {
+      list: link,
+      onUpdate: (name) => {
+        console.log('new name', name);
+        link.label = name;
+        this.setState(previousState => {
+          const objIndex = previousState.links.findIndex((obj => obj.id == link.id));
+          previousState.links[objIndex].label = name;
+          return {
+            links: previousState.links
+          }
+        });
+      }
+    });
   };
 }
 

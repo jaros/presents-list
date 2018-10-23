@@ -43,6 +43,7 @@ export default class NewListScreen extends React.Component {
         if (params && params.list && params.list !== this.state.currentList) {
           this.setState({
             currentList: params.list,
+            onCurrentListUpdate: params.onUpdate,
             items: []
           }, this.loadStoredItems);
         }
@@ -123,13 +124,6 @@ export default class NewListScreen extends React.Component {
     // Alert.alert('You tapped the button!');
   };
 
-  handleIndexChange = (index) => {
-    this.setState({
-      ...this.state,
-      selectedIndex: index,
-    });
-  }
-
   showEditListName = (visible) => {
     this.setState({modalListNameVisible: visible});
   };
@@ -182,6 +176,9 @@ export default class NewListScreen extends React.Component {
                   }
                 });
                 this.showEditListName(false);
+                if (this.state.onCurrentListUpdate) {
+                  this.state.onCurrentListUpdate(value);
+                }
               }}
               initValue={this.state.currentList.label}
               saveLabel='Save'
