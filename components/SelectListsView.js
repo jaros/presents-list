@@ -4,25 +4,34 @@ import { Ionicons } from '@expo/vector-icons';
 import Touchable from 'react-native-platform-touchable';
 import Colors from '../constants/Colors';
 
+export const todoItemsMetaList = {
+  active: 1,
+  links: [
+    {
+      id: 1,
+      label: 'Primary list',
+      showDone: true,
+    },
+    {
+      id: 2,
+      label: 'Kids list',
+      showDone: true,
+    },
+    {
+      id: 3,
+      label: 'Food list',
+      showDone: true,
+    },
+  ]
+};
+
 export default class SelectListsView extends React.Component {
   constructor(props) {
     super(props);
+    let metaList = todoItemsMetaList;
     this.state = {
-      active: 1,
-      links: [
-        {
-          id: 1,
-          label: 'Primary list'
-        },
-        {
-          id: 2,
-          label: 'Kids list'
-        },
-        {
-          id: 3,
-          label: 'Food list'
-        },
-      ]
+      active: metaList.active,
+      links: metaList.links
     };
   }
 

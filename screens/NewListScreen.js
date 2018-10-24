@@ -16,6 +16,7 @@ import TextEdit from '../components/TextEdit';
 import { AsyncStorage } from "react-native"
 import { Header } from 'react-navigation';
 import DoubleClick from 'react-native-double-tap';
+import {todoItemsMetaList} from '../components/SelectListsView';
 
 export default class NewListScreen extends React.Component {
   static navigationOptions = {
@@ -27,12 +28,13 @@ export default class NewListScreen extends React.Component {
     this.state = {
       items: [],
       showDone: true,
-      selectedIndex: 0,
-      currentList: {id: 1, label: 'Primary list'},
+      metaList: todoItemsMetaList,
+      currentList: todoItemsMetaList.links.find(it => it.id === todoItemsMetaList.active),
       modalListNameVisible: false,
     };
+
+    this.loadMetaList();
     this.loadStoredItems();
-    this.loadPreferences();
 
     const willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
@@ -63,11 +65,11 @@ export default class NewListScreen extends React.Component {
       }).catch(err => console.log(err));
   };
 
-  loadPreferences = () => {
-      AsyncStorage.getItem('TODO_SHOW_DONE').then(value => {
+  loadMetaList = () => {
+      AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
         if (value) {
           this.setState({
-            showDone: JSON.parse(value)
+            metaList: JSON.parse(value)
           });
         }
       }).catch(err => console.log(err));
