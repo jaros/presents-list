@@ -64,6 +64,7 @@ export default createMaterialTopTabNavigator({
     // tabBarPosition: 'bottom',
     swipeEnabled: true,
     animationEnabled: true,
+    lazy: true,
     tabBarOptions: {
         showLabel: true,
         showIcon: false,

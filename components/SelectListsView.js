@@ -41,7 +41,7 @@ export default class SelectListsView extends React.Component {
 
   render() {
     return (
-      <View>
+      <View style={styles.container}>
         <Text style={styles.optionsTitleText}>
           Lists
         </Text>
@@ -64,6 +64,39 @@ export default class SelectListsView extends React.Component {
             </View>
           </Touchable>
         )}
+        <Touchable
+          background={Touchable.Ripple('#66ff40', false)}
+          style={styles.option}
+          onPress={() => {
+            this.setState(previousState => {
+              oldLinks = previousState.links;
+              let newList = {
+                id: oldLinks.length + 1,
+                label: 'New list',
+                showDone: true,
+              }
+              oldLinks.push(newList);
+              return {
+                  links: oldLinks,
+                  active: newList.id,
+              };
+            }, () => {
+              // TODO: save to metaList
+              let links = this.state.links;
+              this._handlePressListLink(links[links.length - 1])();
+            });
+          }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
+            <View style={styles.optionIconContainer}>
+              <Ionicons name="ios-add-circle-outline" size={22} color={"#ccc"} />
+            </View>
+            <View style={styles.optionTextContainer}>
+              <Text style={styles.optionText}>
+                Add new list
+              </Text>
+            </View>
+          </View>
+        </Touchable>
       </View>
     );
   }
@@ -94,6 +127,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 15,
+    paddingBottom: 15,
   },
   optionsTitleText: {
     fontSize: 16,
