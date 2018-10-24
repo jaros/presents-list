@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, Switch, TouchableHighlight, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-class ActionIcon extends React.Component {
+export class ActionIcon extends React.Component {
   render() {
     return (
     <TouchableHighlight

@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Image, Text, View } from 'react-native';
+import { Button, StyleSheet, Image, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Touchable from 'react-native-platform-touchable';
 import Colors from '../constants/Colors';
+import { ActionIcon } from './TodoItem';
 
 export const todoItemsMetaList = {
   active: 1,
@@ -31,7 +32,8 @@ export default class SelectListsView extends React.Component {
     let metaList = todoItemsMetaList;
     this.state = {
       active: metaList.active,
-      links: metaList.links
+      links: metaList.links,
+      edit: false,
     };
   }
 
@@ -42,27 +44,63 @@ export default class SelectListsView extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.optionsTitleText}>
-          Lists
-        </Text>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={styles.optionsTitleText}>
+            Lists
+          </Text>
+          <View style={{paddingRight: 10}}>
+            {!this.state.edit &&
+              <Button
+                onPress={() => {
+                  this.setState({
+                    edit: true,
+                  })
+                }}
+                title='Edit'/>
+            }
+            {this.state.edit &&
+              <Button
+                onPress={() => {
+                  this.setState({
+                    edit: false,
+                  })
+                }}
+                title='Done'/>
+            }
+          </View>
+        </View>
 
         {this.state.links.map(link =>
-          <Touchable
+          <View
             key={link.id}
+            style={link.id == this.state.active ? styles.activeOption : styles.option}>
+          <Touchable
             background={Touchable.Ripple('#ccc', false)}
-            style={link.id == this.state.active ? styles.activeOption : styles.option}
+            style={{flex: 1}}
             onPress={this._handlePressListLink(link)}>
-            <View style={{ flexDirection: 'row' }}>
-              <View style={styles.optionIconContainer}>
-                <Ionicons name="ios-list" size={22} color={link.id == this.state.active ? "#000" : "#ccc"} />
+
+              <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+                <View style={styles.optionIconContainer}>
+                  <Ionicons name="ios-list" size={22} color={link.id == this.state.active ? "#000" : "#ccc"} />
+                </View>
+                <View style={styles.optionTextContainer}>
+                  <Text style={styles.optionText}>
+                    {link.label}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.optionTextContainer}>
-                <Text style={styles.optionText}>
-                  {link.label}
-                </Text>
+            </Touchable>
+              {this.state.edit &&
+                <View style={styles.optionIconContainer}>
+                <ActionIcon icon='ios-close-circle-outline' click={() => {
+                  console.log('delete a list', link.id);
+                  //this.props.onDelete(this.props.item.key);
+                }}
+                color='red'/>
               </View>
-            </View>
-          </Touchable>
+              }
+          </View>
         )}
         <Touchable
           background={Touchable.Ripple('#66ff40', false)}
@@ -102,6 +140,9 @@ export default class SelectListsView extends React.Component {
   }
 
   _handlePressListLink = (link) => () => {
+    if (this.state.edit) {
+      return;
+    }
     this.setState({
       active: link.id
     });
@@ -142,16 +183,26 @@ const styles = StyleSheet.create({
     marginRight: 9,
   },
   option: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: '#fdfdfd',
+    alignItems: 'center',
+    height: 44,
     paddingHorizontal: 15,
-    paddingVertical: 15,
+    //paddingVertical: 15,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#EDEDED',
   },
   activeOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: Colors.logoLightColor,
+    alignItems: 'center',
+    height: 44,
     paddingHorizontal: 15,
-    paddingVertical: 15,
+    //paddingVertical: 15,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.logoMainColor,
   },
