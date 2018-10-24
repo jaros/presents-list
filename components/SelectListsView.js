@@ -41,6 +41,14 @@ export default class SelectListsView extends React.Component {
     // 'TODO_ITEMS_META_LIST'
   }
 
+  deleteList = (id) => {
+    this.setState(previousState => {
+      return {
+        links: previousState.links.filter(obj => obj.id !== id)
+      }
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -95,6 +103,7 @@ export default class SelectListsView extends React.Component {
                 <View style={styles.optionIconContainer}>
                 <ActionIcon icon='ios-close-circle-outline' click={() => {
                   console.log('delete a list', link.id);
+                  this.deleteList(link.id);
                   //this.props.onDelete(this.props.item.key);
                 }}
                 color='red'/>
