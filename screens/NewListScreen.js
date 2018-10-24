@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  AsyncStorage,
   Button,
   Platform,
   ScrollView,
@@ -13,10 +14,9 @@ import {
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
 import TextEdit from '../components/TextEdit';
-import { AsyncStorage } from "react-native"
 import { Header } from 'react-navigation';
 import DoubleClick from 'react-native-double-tap';
-import {todoItemsMetaList} from '../components/SelectListsView';
+
 
 export default class NewListScreen extends React.Component {
   static navigationOptions = {
@@ -28,18 +28,18 @@ export default class NewListScreen extends React.Component {
     this.state = {
       items: [],
       showDone: true,
-      metaList: todoItemsMetaList,
-      currentList: todoItemsMetaList.links.find(it => it.id === todoItemsMetaList.active),
+      metaList: {},
+      currentList: {},
       modalListNameVisible: false,
     };
 
     this.loadMetaList();
-    this.loadStoredItems();
 
     const willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
       payload => {
         const params = payload.action.params;
+        console.log('opened active list screen!');
         if (params && params.list && params.list !== this.state.currentList) {
           this.setState({
             currentList: params.list,
@@ -68,9 +68,11 @@ export default class NewListScreen extends React.Component {
   loadMetaList = () => {
       AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
         if (value) {
+          const meta = JSON.parse(value);
           this.setState({
-            metaList: JSON.parse(value)
-          });
+            metaList: meta,
+            currentList: meta.links.find(it => it.id === meta.active)
+          }, this.loadStoredItems);
         }
       }).catch(err => console.log(err));
   };

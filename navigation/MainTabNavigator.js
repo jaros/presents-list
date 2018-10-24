@@ -60,7 +60,7 @@ export default createMaterialTopTabNavigator({
   ActiveListStack,
   AboutStack,
 }, {
-    initialRouteName: 'ActiveListStack',
+    // initialRouteName: 'ActiveListStack',
     // tabBarPosition: 'bottom',
     swipeEnabled: true,
     animationEnabled: true,

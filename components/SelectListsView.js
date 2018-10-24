@@ -1,28 +1,18 @@
 import React from 'react';
-import { Button, StyleSheet, Image, Text, View } from 'react-native';
+import { AsyncStorage, Button, StyleSheet, Image, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Touchable from 'react-native-platform-touchable';
 import Colors from '../constants/Colors';
 import { ActionIcon } from './TodoItem';
 
-export const todoItemsMetaList = {
+const todoItemsMetaList = {
   active: 1,
   links: [
     {
       id: 1,
-      label: 'Primary list',
+      label: 'My list',
       showDone: true,
-    },
-    {
-      id: 2,
-      label: 'Kids list',
-      showDone: true,
-    },
-    {
-      id: 3,
-      label: 'Food list',
-      showDone: true,
-    },
+    }
   ]
 };
 
@@ -31,20 +21,51 @@ export default class SelectListsView extends React.Component {
     super(props);
     let metaList = todoItemsMetaList;
     this.state = {
-      active: metaList.active,
-      links: metaList.links,
+      metaList: {
+        active: metaList.active,
+        links: metaList.links,
+      },
       edit: false,
     };
+    this.loadMetaList();
   }
 
-  loadMetaList() {
-    // 'TODO_ITEMS_META_LIST'
+  componentDidMount() {
+    this.navigateToActive(this.state.metaList.links.find(it => it.id == this.state.metaList.active));
   }
+
+  loadMetaList = () => {
+    AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
+      if (value) {
+        this.setState({
+          metaList: JSON.parse(value)
+        });
+      } else {
+        this.setState({
+          metaList: todoItemsMetaList
+        }, this.saveMetaList);
+      }
+    })
+    .catch(err => console.log(err));
+  };
+
+  saveMetaList = () => {
+    AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(this.state.metaList));
+  };
 
   deleteList = (id) => {
     this.setState(previousState => {
       return {
-        links: previousState.links.filter(obj => obj.id !== id)
+        metaList: {
+          ...previousState.metaList,
+          links: previousState.metaList.links.filter(obj => obj.id !== id)
+        }
+      }
+    }, () => {
+      this.saveMetaList();
+      AsyncStorage.removeItem('TODO_ITEMS_' + id);
+      if (id == 1) {
+        AsyncStorage.removeItem('TODO_ITEMS');
       }
     });
   }
@@ -79,10 +100,10 @@ export default class SelectListsView extends React.Component {
           </View>
         </View>
 
-        {this.state.links.map(link =>
+        {this.state.metaList.links.map(link =>
           <View
             key={link.id}
-            style={link.id == this.state.active ? styles.activeOption : styles.option}>
+            style={link.id == this.state.metaList.active ? styles.activeOption : styles.option}>
           <Touchable
             background={Touchable.Ripple('#ccc', false)}
             style={{flex: 1}}
@@ -90,7 +111,7 @@ export default class SelectListsView extends React.Component {
 
               <View style={{ flexDirection: 'row', alignItems: 'center', }}>
                 <View style={styles.optionIconContainer}>
-                  <Ionicons name="ios-list" size={22} color={link.id == this.state.active ? "#000" : "#ccc"} />
+                  <Ionicons name="ios-list" size={22} color={link.id == this.state.metaList.active ? "#000" : "#ccc"} />
                 </View>
                 <View style={styles.optionTextContainer}>
                   <Text style={styles.optionText}>
@@ -99,12 +120,11 @@ export default class SelectListsView extends React.Component {
                 </View>
               </View>
             </Touchable>
-              {this.state.edit &&
+              {this.state.edit && link.id !== this.state.metaList.active &&
                 <View style={styles.optionIconContainer}>
                 <ActionIcon icon='ios-close-circle-outline' click={() => {
                   console.log('delete a list', link.id);
                   this.deleteList(link.id);
-                  //this.props.onDelete(this.props.item.key);
                 }}
                 color='red'/>
               </View>
@@ -116,7 +136,7 @@ export default class SelectListsView extends React.Component {
           style={styles.option}
           onPress={() => {
             this.setState(previousState => {
-              oldLinks = previousState.links;
+              oldLinks = previousState.metaList.links;
               let newList = {
                 id: oldLinks.length + 1,
                 label: 'New list',
@@ -124,12 +144,14 @@ export default class SelectListsView extends React.Component {
               }
               oldLinks.push(newList);
               return {
+                metaList: {
                   links: oldLinks,
-                  active: newList.id,
+                  active: newList.id
+                }
               };
             }, () => {
-              // TODO: save to metaList
-              let links = this.state.links;
+              this.saveMetaList();
+              let links = this.state.metaList.links;
               this._handlePressListLink(links[links.length - 1])();
             });
           }}>
@@ -153,8 +175,15 @@ export default class SelectListsView extends React.Component {
       return;
     }
     this.setState({
-      active: link.id
-    });
+      metaList: {
+        ...this.state.metaList,
+        active: link.id
+      }
+    }, this.saveMetaList);
+    this.navigateToActive(link);
+  };
+
+  navigateToActive = (link) => {
     this.props.navigation.navigate('ActiveListStack',
     {
       list: link,
@@ -162,12 +191,15 @@ export default class SelectListsView extends React.Component {
         console.log('new name', name);
         link.label = name;
         this.setState(previousState => {
-          const objIndex = previousState.links.findIndex((obj => obj.id == link.id));
-          previousState.links[objIndex].label = name;
+          const objIndex = previousState.metaList.links.findIndex((obj => obj.id == link.id));
+          previousState.metaList.links[objIndex].label = name;
           return {
-            links: previousState.links
+            metaList: {
+              ...this.state.metaList,
+              links: previousState.metaList.links
+            }
           }
-        });
+        }, this.saveMetaList);
       }
     });
   };
