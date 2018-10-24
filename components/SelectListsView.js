@@ -27,20 +27,23 @@ export default class SelectListsView extends React.Component {
       },
       edit: false,
     };
-    this.loadMetaList();
-  }
 
-  componentDidMount() {
-    this.navigateToActive(this.state.metaList.links.find(it => it.id == this.state.metaList.active));
+    // const willFocusSubscription = this.props.navigation.addListener(
+    //   'willFocus',
+    //   () => this.loadMetaList()
+    // );
+    this.loadMetaList().then(() =>
+      this.navigateToActive(this.state.metaList.links.find(it => it.id == this.state.metaList.active))
+    );
   }
 
   loadMetaList = () => {
-    AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
+    return AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
       if (value) {
         this.setState({
           metaList: JSON.parse(value)
         });
-      } else {
+      } else { // init first time
         this.setState({
           metaList: todoItemsMetaList
         }, this.saveMetaList);
@@ -187,20 +190,14 @@ export default class SelectListsView extends React.Component {
     this.props.navigation.navigate('ActiveListStack',
     {
       list: link,
-      onUpdate: (name) => {
-        console.log('new name', name);
-        link.label = name;
-        this.setState(previousState => {
-          const objIndex = previousState.metaList.links.findIndex((obj => obj.id == link.id));
-          previousState.metaList.links[objIndex].label = name;
-          return {
-            metaList: {
-              ...this.state.metaList,
-              links: previousState.metaList.links
-            }
-          }
-        }, this.saveMetaList);
-      }
+      // onUpdate: (meta) => {
+      //   console.log('new metaList', meta);
+      //   this.setState(previousState => {
+      //     return {
+      //       metaList: meta
+      //     }
+      //   });
+      // }
     });
   };
 }

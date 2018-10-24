@@ -27,7 +27,6 @@ export default class NewListScreen extends React.Component {
     super(props);
     this.state = {
       items: [],
-      showDone: true,
       metaList: {},
       currentList: {},
       modalListNameVisible: false,
@@ -43,7 +42,7 @@ export default class NewListScreen extends React.Component {
         if (params && params.list && params.list !== this.state.currentList) {
           this.setState({
             currentList: params.list,
-            onCurrentListUpdate: params.onUpdate,
+            // onCurrentListUpdate: params.onUpdate,
             items: []
           }, this.loadStoredItems);
         }
@@ -77,18 +76,24 @@ export default class NewListScreen extends React.Component {
       }).catch(err => console.log(err));
   };
 
+  saveMetaList = () => {
+    AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(this.state.metaList));
+    // this.state.onCurrentListUpdate(this.state.metaList);
+  };
+
   storeItems = () => {
     AsyncStorage.setItem(this.listKey(), JSON.stringify(this.state.items));
   };
 
-  storePreferences = () => {
-    AsyncStorage.setItem('TODO_SHOW_DONE', JSON.stringify(this.state.showDone));
-  };
-
   toggleShowDoneItems = () => {
     this.setState(previousState => {
-      return {showDone: !previousState.showDone};
-    }, this.storePreferences);
+      let isShowDone = previousState.currentList.showDone;
+
+      const objIndex = previousState.metaList.links.findIndex((obj => obj.id == previousState.currentList.id));
+      previousState.metaList.links[objIndex].showDone = !isShowDone;
+
+      return {metaList: previousState.metaList};
+    }, this.saveMetaList);
   };
 
   deleteItem = (key) => {
@@ -170,17 +175,17 @@ export default class NewListScreen extends React.Component {
             <TextEdit
               onSave={(value) => {
                 this.setState(previousState => {
+                  const objIndex = previousState.metaList.links.findIndex((obj => obj.id == this.state.currentList.id));
+                  previousState.metaList.links[objIndex].label = value;
                   return {
-                    currentList: {
-                      id: previousState.currentList.id,
-                      label: value
+                    metaList: {
+                      ...this.state.metaList,
+                      links: previousState.metaList.links
                     }
                   }
-                });
+                }, this.saveMetaList);
+
                 this.showEditListName(false);
-                if (this.state.onCurrentListUpdate) {
-                  this.state.onCurrentListUpdate(value);
-                }
               }}
               initValue={this.state.currentList.label}
               saveLabel='Save'
@@ -211,7 +216,7 @@ export default class NewListScreen extends React.Component {
 
           {
             this.state.items
-            .filter(item => !item.done || this.state.showDone)
+            .filter(item => !item.done || this.state.currentList.showDone)
             .map(item =>
               <TodoItem key={item.key}
                 item={item}
@@ -226,7 +231,7 @@ export default class NewListScreen extends React.Component {
             <Button
               color={Colors.logoMainColor}
               onPress={this.toggleShowDoneItems}
-              title={this.state.showDone ? "Hide done" : "Show done"}/>
+              title={this.state.currentList.showDone ? "Hide done" : "Show done"}/>
           }
           </View>
         </ScrollView>
