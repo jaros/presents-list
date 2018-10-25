@@ -62,12 +62,14 @@ export default class NewListScreen extends React.Component {
           const meta = JSON.parse(value);
           this.setState({
             metaList: meta,
-            currentList: meta.links.find(it => it.id === meta.active)
+            currentList: meta.links.find(it => it.id === meta.active),
+            items: []
           }, this.loadStoredItems);
         }  else { // init first time
           this.setState({
             metaList: todoItemsMetaList,
-            currentList: todoItemsMetaList.links[0]
+            currentList: todoItemsMetaList.links[0],
+            items: []
           }, this.saveMetaList);
         }
       }).catch(err => console.log(err));
@@ -76,7 +78,6 @@ export default class NewListScreen extends React.Component {
   saveMetaList = () => {
     console.log('saving metaList', this.state.metaList);
     AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(this.state.metaList));
-    // this.state.onCurrentListUpdate(this.state.metaList);
   };
 
   storeItems = () => {
