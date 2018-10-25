@@ -115,7 +115,10 @@ export default class SelectListsView extends React.Component {
             </Touchable>
               {this.state.edit && link.id !== this.state.metaList.active &&
                 <View style={styles.optionIconContainer}>
-                <ActionIcon icon='ios-close-circle-outline' click={() => {
+                <ActionIcon
+                  icon='ios-remove-circle-outline'
+                  size={22}
+                  click={() => {
                   console.log('delete a list', link.id);
                   this.deleteList(link.id);
                 }}

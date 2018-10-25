@@ -53,7 +53,7 @@ export default class TodoItem extends React.Component {
           <Text style={ this.textStyle() }>{this.props.item.text}</Text>
         </View>
 
-        <ActionIcon icon='ios-close-circle-outline' click={() => {
+        <ActionIcon icon='ios-remove-circle-outline' click={() => {
           console.log('delete a note', this.props.item.key);
           this.props.onDelete(this.props.item.key);
         }}
