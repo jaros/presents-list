@@ -60,11 +60,11 @@ export default createMaterialTopTabNavigator({
   ActiveListStack,
   AboutStack,
 }, {
-    // initialRouteName: 'ActiveListStack',
+    initialRouteName: 'ActiveListStack',
     // tabBarPosition: 'bottom',
     swipeEnabled: true,
     animationEnabled: true,
-    lazy: true,
+    lazy: false,
     tabBarOptions: {
         showLabel: true,
         showIcon: false,

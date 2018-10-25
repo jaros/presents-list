@@ -16,7 +16,7 @@ import TodoItem from '../components/TodoItem';
 import TextEdit from '../components/TextEdit';
 import { Header } from 'react-navigation';
 import DoubleClick from 'react-native-double-tap';
-
+import { todoItemsMetaList } from '../components/SelectListsView';
 
 export default class NewListScreen extends React.Component {
   static navigationOptions = {
@@ -37,21 +37,13 @@ export default class NewListScreen extends React.Component {
     const willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
       payload => {
-        const params = payload.action.params;
-        console.log('opened active list screen!');
-        if (params && params.list && params.list !== this.state.currentList) {
-          this.setState({
-            currentList: params.list,
-            // onCurrentListUpdate: params.onUpdate,
-            items: []
-          }, this.loadStoredItems);
-        }
+        this.loadMetaList();
       }
     );
   }
 
   listKey = () => {
-    return this.state.currentList.id === 1 ? 'TODO_ITEMS' : 'TODO_ITEMS_' + this.state.currentList.id;
+    return 'TODO_ITEMS_' + this.state.currentList.id;
   }
 
   loadStoredItems = () => {
@@ -72,11 +64,17 @@ export default class NewListScreen extends React.Component {
             metaList: meta,
             currentList: meta.links.find(it => it.id === meta.active)
           }, this.loadStoredItems);
+        }  else { // init first time
+          this.setState({
+            metaList: todoItemsMetaList,
+            currentList: todoItemsMetaList.links[0]
+          }, this.saveMetaList);
         }
       }).catch(err => console.log(err));
   };
 
   saveMetaList = () => {
+    console.log('saving metaList', this.state.metaList);
     AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(this.state.metaList));
     // this.state.onCurrentListUpdate(this.state.metaList);
   };
@@ -179,9 +177,10 @@ export default class NewListScreen extends React.Component {
                   previousState.metaList.links[objIndex].label = value;
                   return {
                     metaList: {
-                      ...this.state.metaList,
+                      ...previousState.metaList,
                       links: previousState.metaList.links
-                    }
+                    },
+                    currentList: previousState.metaList.links[objIndex]
                   }
                 }, this.saveMetaList);
 

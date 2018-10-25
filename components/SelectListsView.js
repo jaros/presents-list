@@ -5,7 +5,7 @@ import Touchable from 'react-native-platform-touchable';
 import Colors from '../constants/Colors';
 import { ActionIcon } from './TodoItem';
 
-const todoItemsMetaList = {
+export const todoItemsMetaList = {
   active: 1,
   links: [
     {
@@ -19,22 +19,12 @@ const todoItemsMetaList = {
 export default class SelectListsView extends React.Component {
   constructor(props) {
     super(props);
-    let metaList = todoItemsMetaList;
     this.state = {
-      metaList: {
-        active: metaList.active,
-        links: metaList.links,
-      },
+      metaList: todoItemsMetaList,
       edit: false,
     };
 
-    // const willFocusSubscription = this.props.navigation.addListener(
-    //   'willFocus',
-    //   () => this.loadMetaList()
-    // );
-    this.loadMetaList().then(() =>
-      this.navigateToActive(this.state.metaList.links.find(it => it.id == this.state.metaList.active))
-    );
+    const willFocusSubscription = this.props.navigation.addListener('willFocus',this.loadMetaList);
   }
 
   loadMetaList = () => {
@@ -141,7 +131,7 @@ export default class SelectListsView extends React.Component {
             this.setState(previousState => {
               oldLinks = previousState.metaList.links;
               let newList = {
-                id: oldLinks.length + 1,
+                id: new Date().getTime(),
                 label: 'New list',
                 showDone: true,
               }
@@ -187,18 +177,7 @@ export default class SelectListsView extends React.Component {
   };
 
   navigateToActive = (link) => {
-    this.props.navigation.navigate('ActiveListStack',
-    {
-      list: link,
-      // onUpdate: (meta) => {
-      //   console.log('new metaList', meta);
-      //   this.setState(previousState => {
-      //     return {
-      //       metaList: meta
-      //     }
-      //   });
-      // }
-    });
+    this.props.navigation.navigate('ActiveListStack', {});
   };
 }
 
