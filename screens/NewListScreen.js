@@ -8,12 +8,12 @@ import {
   Text,
   View,
   KeyboardAvoidingView,
-  Modal,
   Alert,
 } from 'react-native';
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
 import TextEdit from '../components/TextEdit';
+import RenameList from '../components/RenameList';
 import { Header } from 'react-navigation';
 import DoubleClick from 'react-native-double-tap';
 import { todoItemsMetaList } from '../components/SelectListsView';
@@ -29,7 +29,7 @@ export default class NewListScreen extends React.Component {
       items: [],
       metaList: {},
       currentList: {},
-      modalListNameVisible: false,
+      showRenameList: false,
     };
 
     this.loadMetaList();
@@ -130,8 +130,23 @@ export default class NewListScreen extends React.Component {
     // Alert.alert('You tapped the button!');
   };
 
-  showEditListName = (visible) => {
-    this.setState({modalListNameVisible: visible});
+
+  onListNameUpdate = (value) => {
+    this.setState(previousState => {
+      const objIndex = previousState.metaList.links.findIndex((obj => obj.id == this.state.currentList.id));
+      previousState.metaList.links[objIndex].label = value;
+      return {
+        metaList: {
+          ...previousState.metaList,
+          links: previousState.metaList.links
+        },
+        currentList: previousState.metaList.links[objIndex]
+      }
+    }, this.saveMetaList);
+  };
+
+  toggleShowRenameList = () => {
+    this.setState(previousState => { return {showRenameList: !previousState.showRenameList}});
   };
 
   render() {
@@ -151,7 +166,7 @@ export default class NewListScreen extends React.Component {
           }}
           doubleTap={() => {
             console.log("double tap");
-            this.showEditListName(true);
+            this.toggleShowRenameList();
           }}
           delay={200}>
           <View style={{height: 44, alignItems: 'center', backgroundColor: Colors.logoLightColor}}>
@@ -164,44 +179,12 @@ export default class NewListScreen extends React.Component {
             </Text>
           </View>
         </DoubleClick>
-        <Modal
-          animationType='slide'
-          transparent={false}
-          visible={this.state.modalListNameVisible}
-          presentationStyle='pageSheet'
-          >
-          <View style={{marginTop: 22}}>
-            <TextEdit
-              onSave={(value) => {
-                this.setState(previousState => {
-                  const objIndex = previousState.metaList.links.findIndex((obj => obj.id == this.state.currentList.id));
-                  previousState.metaList.links[objIndex].label = value;
-                  return {
-                    metaList: {
-                      ...previousState.metaList,
-                      links: previousState.metaList.links
-                    },
-                    currentList: previousState.metaList.links[objIndex]
-                  }
-                }, this.saveMetaList);
-
-                this.showEditListName(false);
-              }}
-              initValue={this.state.currentList.label}
-              saveLabel='Save'
-              textInputPlaceholder='Provide a name for current list'
-            />
-            <View>
-              <Button
-                onPress={() => {
-                  this.showEditListName(false);
-                }}
-                title='Cancel'
-                >
-              </Button>
-            </View>
-          </View>
-        </Modal>
+        <RenameList
+          onUpdate={this.onListNameUpdate}
+          initValue={this.state.currentList.label}
+          show={this.state.showRenameList}
+          toggleShow={this.toggleShowRenameList}
+          />
         </View>
 
         <ScrollView

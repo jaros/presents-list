@@ -114,15 +114,35 @@ export default class SelectListsView extends React.Component {
               </View>
             </Touchable>
               {this.state.edit && link.id !== this.state.metaList.active &&
+                <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
                 <View style={styles.optionIconContainer}>
-                <ActionIcon
-                  icon='ios-remove-circle-outline'
-                  size={22}
-                  click={() => {
-                  console.log('delete a list', link.id);
-                  this.deleteList(link.id);
-                }}
-                color='red'/>
+                  <ActionIcon
+                    icon='ios-paper-plane'
+                    click={() => {
+                    console.log('share a list', link.id);
+                    //this.deleteList(link.id);
+                  }}
+                  />
+              </View>
+              <View style={styles.optionIconContainer}>
+                  <ActionIcon
+                    icon='ios-create'
+                    click={() => {
+                    console.log('rename a list', link.id);
+                    //this.deleteList(link.id);
+                  }}
+                  color={'dodgerblue'}
+                  />
+                </View>
+                <View style={styles.optionIconContainer}>
+                  <ActionIcon
+                    icon='ios-remove-circle-outline'
+                    click={() => {
+                    console.log('delete a list', link.id);
+                    this.deleteList(link.id);
+                  }}
+                  color='red'/>
+              </View>
               </View>
               }
           </View>
