@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View, Switch, TouchableHighlight, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import RenameList from './RenameList';
 
 export class ActionIcon extends React.Component {
   render() {
@@ -18,7 +19,9 @@ export default class TodoItem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      done: this.props.item.done
+      done: this.props.item.done,
+      showRenameList: false,
+      lastTimeEditClicked: 0,
     };
   }
 
@@ -29,6 +32,15 @@ export default class TodoItem extends React.Component {
         this.props.onDone(this.props.item.key, this.state.done);
       })
   }
+
+  toggleShowRenameList = () => {
+    this.setState(previousState => { return {showRenameList: !previousState.showRenameList}});
+  };
+
+  onTextUpdate = (value) => {
+    console.log('updated item to: ', value);
+    this.props.onChange(this.props.item.key, value);
+  };
 
   textStyle() {
     return this.state.done ? [styles.item, styles.done] : [styles.item, styles.itemColor];
@@ -50,7 +62,21 @@ export default class TodoItem extends React.Component {
           width: 60,
           flexGrow: 1,
           }}>
-          <Text style={ this.textStyle() }>{this.props.item.text}</Text>
+          <TouchableHighlight
+            style={{flexGrow: 1}}
+            underlayColor="lightgrey"
+            onPress={() => {
+              const now = new Date().getTime();
+              if (now - this.state.lastTimeEditClicked <= 200) {
+                this.toggleShowRenameList();
+              }
+              this.setState({
+                lastTimeEditClicked: now
+              });
+            }
+          }>
+            <Text style={ this.textStyle() }>{this.props.item.text}</Text>
+          </TouchableHighlight>
         </View>
 
         <ActionIcon icon='ios-remove-circle-outline' click={() => {
@@ -58,6 +84,13 @@ export default class TodoItem extends React.Component {
           this.props.onDelete(this.props.item.key);
         }}
         color='red'/>
+
+        <RenameList
+          onUpdate={this.onTextUpdate}
+          initValue={this.props.item.text}
+          show={this.state.showRenameList}
+          toggleShow={this.toggleShowRenameList}
+        />
       </View>
     )
   }

@@ -104,18 +104,26 @@ export default class NewListScreen extends React.Component {
     }, this.storeItems);
   };
 
-  toggleItem = (key, isDone) => {
+  updateItem = (key, apply) => {
     this.setState(previousState => {
       return {
         items: previousState.items.map(item => {
           if (item.key === key) {
-            item.done = isDone;
+            apply(item);
           }
           return item;
         })
       }
     }, this.storeItems);
   };
+
+  toggleItem = (key, isDone) => {
+    this.updateItem(key, (item) => item.done = isDone);
+  };
+
+  changeItemText = (key, value) => {
+    this.updateItem(key, (item) => item.text = value);
+  }
 
   addItem = (newValue) => {
     this.setState(previousState => {
@@ -161,11 +169,7 @@ export default class NewListScreen extends React.Component {
         <View style={{paddingTop: 10}}>
 
         <DoubleClick
-          singleTap={() => {
-            console.log("single tap");
-          }}
           doubleTap={() => {
-            console.log("double tap");
             this.toggleShowRenameList();
           }}
           delay={200}>
@@ -205,6 +209,7 @@ export default class NewListScreen extends React.Component {
                 item={item}
                 onDelete={this.deleteItem}
                 onDone={this.toggleItem}
+                onChange={this.changeItemText}
                 />
             )
           }

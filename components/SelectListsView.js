@@ -84,8 +84,7 @@ export default class SelectListsView extends React.Component {
   deleteList = (id) => {
     this.setState(previousState => {
       const links = previousState.metaList.links.filter(obj => obj.id !== id);
-      //const links = filteredLinks.length == 0 ? todoItemsMetaList.links : filteredLinks;
-
+      
       const active = id !== previousState.metaList.active
         ? previousState.metaList.active // remain current active
         : links.length !== 0 ? links[0].id : -1; // take  first from the rest
