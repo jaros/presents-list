@@ -58,7 +58,7 @@ export default class NewListScreen extends React.Component {
 
   loadMetaList = () => {
       AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
-        if (value) {
+        if (value && JSON.parse(value).links.length !== 0) {
           const meta = JSON.parse(value);
           this.setState({
             metaList: meta,
