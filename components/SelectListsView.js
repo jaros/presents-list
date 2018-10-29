@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Touchable from 'react-native-platform-touchable';
 import Colors from '../constants/Colors';
 import { ActionIcon } from './TodoItem';
+import RenameList from '../components/RenameList';
 
 export const todoItemsMetaList = {
   active: 1,
@@ -22,10 +23,44 @@ export default class SelectListsView extends React.Component {
     this.state = {
       metaList: todoItemsMetaList,
       edit: false,
+      editableList: 0,
+      showRenameList: false,
     };
 
     const willFocusSubscription = this.props.navigation.addListener('willFocus',this.loadMetaList);
   }
+
+  activeList = () => {
+    return this.state.metaList.links.find(it => it.id === this.state.metaList.active);
+  };
+
+  editableListName = () => {
+    const list = this.state.metaList.links.find(it => it.id === this.state.editableList);
+    return list ? list.label : 'no list selected';
+  };
+
+  toggleShowRenameList = (listId) => {
+
+    this.setState(previousState => {
+      return {
+        showRenameList: !previousState.showRenameList,
+        editableList: listId
+      }
+    });
+  };
+
+  onListNameUpdate = (value) => {
+    this.setState(previousState => {
+      const objIndex = previousState.metaList.links.findIndex((obj => obj.id == previousState.editableList));
+      previousState.metaList.links[objIndex].label = value;
+      return {
+        metaList: {
+          ...previousState.metaList,
+          links: previousState.metaList.links
+        }
+      }
+    }, this.saveMetaList);
+  };
 
   loadMetaList = () => {
     return AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
@@ -113,7 +148,7 @@ export default class SelectListsView extends React.Component {
                 </View>
               </View>
             </Touchable>
-              {this.state.edit && link.id !== this.state.metaList.active &&
+              {this.state.edit &&
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
                 <View style={styles.optionIconContainer}>
                   <ActionIcon
@@ -127,13 +162,11 @@ export default class SelectListsView extends React.Component {
               <View style={styles.optionIconContainer}>
                   <ActionIcon
                     icon='ios-create'
-                    click={() => {
-                    console.log('rename a list', link.id);
-                    //this.deleteList(link.id);
-                  }}
-                  color={'dodgerblue'}
+                    click={() => this.toggleShowRenameList(link.id)}
+                    color={'dodgerblue'}
                   />
                 </View>
+                {link.id !== this.state.metaList.active &&
                 <View style={styles.optionIconContainer}>
                   <ActionIcon
                     icon='ios-remove-circle-outline'
@@ -142,7 +175,8 @@ export default class SelectListsView extends React.Component {
                     this.deleteList(link.id);
                   }}
                   color='red'/>
-              </View>
+                </View>
+                }
               </View>
               }
           </View>
@@ -182,15 +216,22 @@ export default class SelectListsView extends React.Component {
             </View>
           </View>
         </Touchable>
+
+        {this.state.editableList &&
+          <RenameList
+            onUpdate={this.onListNameUpdate}
+            initValue={this.editableListName}
+            show={this.state.showRenameList}
+            toggleShow={this.toggleShowRenameList}
+            />
+        }
       </View>
     );
   }
 
   _handlePressListLink = (link) => () => {
-    if (this.state.edit) {
-      return;
-    }
     this.setState({
+      edit: false,
       metaList: {
         ...this.state.metaList,
         active: link.id

@@ -6,10 +6,13 @@ export default class TextEdit extends React.Component {
 
   constructor(props) {
     super(props);
+    const initValue = this.funCheck(this.props.initValue) ? this.props.initValue() : this.props.initValue;
     this.state = {
-      text: this.props.initValue,
+      text: initValue,
     };
   }
+
+  funCheck = (v) => typeof v === "function";
 
   onSavePressed = () => {
     if (this.state.text) {
