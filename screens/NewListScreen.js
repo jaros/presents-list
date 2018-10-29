@@ -2,20 +2,18 @@ import React from 'react';
 import {
   AsyncStorage,
   Button,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   View,
   KeyboardAvoidingView,
-  Alert,
 } from 'react-native';
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
 import TextEdit from '../components/TextEdit';
 import RenameList from '../components/RenameList';
+import ActiveListTitle from '../components/ActiveListTitle';
 import { Header } from 'react-navigation';
-import DoubleClick from 'react-native-double-tap';
 import { todoItemsMetaList } from '../components/SelectListsView';
 
 export default class NewListScreen extends React.Component {
@@ -167,22 +165,10 @@ export default class NewListScreen extends React.Component {
         >
 
         <View style={{paddingTop: 10}}>
-
-        <DoubleClick
-          doubleTap={() => {
-            this.toggleShowRenameList();
-          }}
-          delay={200}>
-          <View style={{height: 44, alignItems: 'center', backgroundColor: Colors.logoLightColor}}>
-            <Text style={{
-              fontSize: 18,
-              fontWeight: '500',
-              padding: 13,
-              color: Colors.logoText}}>
-                {this.state.currentList.label}
-            </Text>
-          </View>
-        </DoubleClick>
+          <ActiveListTitle
+            onDoubleTap={this.toggleShowRenameList}
+            title={this.state.currentList.label}
+            />
         <RenameList
           onUpdate={this.onListNameUpdate}
           initValue={this.state.currentList.label}
