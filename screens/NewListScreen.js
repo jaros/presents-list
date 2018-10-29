@@ -11,7 +11,6 @@ import {
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
 import TextEdit from '../components/TextEdit';
-import RenameList from '../components/RenameList';
 import ActiveListTitle from '../components/ActiveListTitle';
 import { Header } from 'react-navigation';
 import { todoItemsMetaList } from '../components/SelectListsView';
@@ -27,7 +26,6 @@ export default class NewListScreen extends React.Component {
       items: [],
       metaList: {},
       currentList: {},
-      showRenameList: false,
     };
 
     this.loadMetaList();
@@ -151,10 +149,6 @@ export default class NewListScreen extends React.Component {
     }, this.saveMetaList);
   };
 
-  toggleShowRenameList = () => {
-    this.setState(previousState => { return {showRenameList: !previousState.showRenameList}});
-  };
-
   render() {
     return (
       <KeyboardAvoidingView
@@ -164,18 +158,10 @@ export default class NewListScreen extends React.Component {
         keyboardVerticalOffset={Header.HEIGHT + 35}
         >
 
-        <View style={{paddingTop: 10}}>
-          <ActiveListTitle
-            onDoubleTap={this.toggleShowRenameList}
-            title={this.state.currentList.label}
-            />
-        <RenameList
+        <ActiveListTitle
           onUpdate={this.onListNameUpdate}
-          initValue={this.state.currentList.label}
-          show={this.state.showRenameList}
-          toggleShow={this.toggleShowRenameList}
+          title={this.state.currentList.label}
         />
-        </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
