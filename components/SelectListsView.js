@@ -134,7 +134,7 @@ export default class SelectListsView extends React.Component {
             style={link.id == this.state.metaList.active ? styles.activeOption : styles.option}>
           <Touchable
             background={Touchable.Ripple('#ccc', false)}
-            style={{flex: 1}}
+            style={{flex: 1, overflow: 'hidden', }}
             onPress={this._handlePressListLink(link)}>
 
               <View style={{ flexDirection: 'row', alignItems: 'center', }}>

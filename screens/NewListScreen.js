@@ -184,7 +184,7 @@ export default class NewListScreen extends React.Component {
           initValue={this.state.currentList.label}
           show={this.state.showRenameList}
           toggleShow={this.toggleShowRenameList}
-          />
+        />
         </View>
 
         <ScrollView
