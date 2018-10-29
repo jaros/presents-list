@@ -1,22 +1,22 @@
 import React from 'react';
 import {
-  Animated,
-  Image,
+  AsyncStorage,
   Button,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  TouchableHighlight,
   View,
-  TextInput,
+  KeyboardAvoidingView,
+  Alert,
 } from 'react-native';
-import { WebBrowser } from 'expo';
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
-import { MonoText } from '../components/StyledText';
-import { AsyncStorage } from "react-native"
+import TextEdit from '../components/TextEdit';
+import RenameList from '../components/RenameList';
+import { Header } from 'react-navigation';
+import DoubleClick from 'react-native-double-tap';
+import { todoItemsMetaList } from '../components/SelectListsView';
 
 export default class NewListScreen extends React.Component {
   static navigationOptions = {
@@ -26,20 +26,29 @@ export default class NewListScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: '',
       items: [],
-      showDone: true,
-      scrollY: new Animated.Value(0),
+      metaList: {},
+      currentList: {},
+      showRenameList: false,
     };
-    this.loadStoredItems();
-    this.loadPreferences();
+
+    this.loadMetaList();
+
+    const willFocusSubscription = this.props.navigation.addListener(
+      'willFocus',
+      payload => {
+        this.loadMetaList();
+      }
+    );
+  }
+
+  listKey = () => {
+    return 'TODO_ITEMS_' + this.state.currentList.id;
   }
 
   loadStoredItems = () => {
-      AsyncStorage.getItem('TODO_ITEMS').then(value => {
+      AsyncStorage.getItem(this.listKey()).then(value => {
         if (value) {
-          // We have data!!
-          console.log("got items from DB", value);
           this.setState({
             items: JSON.parse(value)
           });
@@ -47,30 +56,43 @@ export default class NewListScreen extends React.Component {
       }).catch(err => console.log(err));
   };
 
-  loadPreferences = () => {
-      AsyncStorage.getItem('TODO_SHOW_DONE').then(value => {
-        if (value) {
-          // We have data!!
-          console.log("got showDone from DB", value);
+  loadMetaList = () => {
+      AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
+        if (value && JSON.parse(value).links.length !== 0) {
+          const meta = JSON.parse(value);
           this.setState({
-            showDone: JSON.parse(value)
-          });
+            metaList: meta,
+            currentList: meta.links.find(it => it.id === meta.active),
+            items: []
+          }, this.loadStoredItems);
+        }  else { // init first time
+          this.setState({
+            metaList: todoItemsMetaList,
+            currentList: todoItemsMetaList.links[0],
+            items: []
+          }, this.saveMetaList);
         }
       }).catch(err => console.log(err));
   };
 
-  storeItems = () => {
-    AsyncStorage.setItem('TODO_ITEMS', JSON.stringify(this.state.items));
+  saveMetaList = () => {
+    console.log('saving metaList', this.state.metaList);
+    AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(this.state.metaList));
   };
 
-  storePreferences = () => {
-    AsyncStorage.setItem('TODO_SHOW_DONE', JSON.stringify(this.state.showDone));
+  storeItems = () => {
+    AsyncStorage.setItem(this.listKey(), JSON.stringify(this.state.items));
   };
 
   toggleShowDoneItems = () => {
     this.setState(previousState => {
-      return {showDone: !previousState.showDone};
-    }, this.storePreferences);
+      let isShowDone = previousState.currentList.showDone;
+
+      const objIndex = previousState.metaList.links.findIndex((obj => obj.id == previousState.currentList.id));
+      previousState.metaList.links[objIndex].showDone = !isShowDone;
+
+      return {metaList: previousState.metaList};
+    }, this.saveMetaList);
   };
 
   deleteItem = (key) => {
@@ -83,7 +105,6 @@ export default class NewListScreen extends React.Component {
   };
 
   toggleItem = (key, isDone) => {
-    console.log('toggle ...', key)
     this.setState(previousState => {
       return {
         items: previousState.items.map(item => {
@@ -96,49 +117,79 @@ export default class NewListScreen extends React.Component {
     }, this.storeItems);
   };
 
-  addItem = () => {
-    if (this.state.text) {
-      this.setState(previousState => {
-        return {
-          items: [{
-              key: new Date().getTime(),
-              text: previousState.text
-            }]
-            .concat(previousState.items),
-          text: ''
-        }
-      }, this.storeItems);
-    }
-
+  addItem = (newValue) => {
     this.setState(previousState => {
       return {
-        items: previousState.text ?
-          [{
+        items: [{
             key: new Date().getTime(),
-            text: previousState.text
-          }].concat(previousState.items) :
-          previousState.items,
-        text: ''
+            text: newValue
+          }]
+          .concat(previousState.items)
       }
-    });
+    }, this.storeItems);
     // Alert.alert('You tapped the button!');
   };
 
-  render() {
-    const headerHeight = this.state.scrollY.interpolate({
-      inputRange: [0, HEADER_SCROLL_DISTANCE],
-      outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
-      extrapolate: 'clamp',
-    });
 
+  onListNameUpdate = (value) => {
+    this.setState(previousState => {
+      const objIndex = previousState.metaList.links.findIndex((obj => obj.id == this.state.currentList.id));
+      previousState.metaList.links[objIndex].label = value;
+      return {
+        metaList: {
+          ...previousState.metaList,
+          links: previousState.metaList.links
+        },
+        currentList: previousState.metaList.links[objIndex]
+      }
+    }, this.saveMetaList);
+  };
+
+  toggleShowRenameList = () => {
+    this.setState(previousState => { return {showRenameList: !previousState.showRenameList}});
+  };
+
+  render() {
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior="padding"
+        enabled
+        keyboardVerticalOffset={Header.HEIGHT + 35}
+        >
+
+        <View style={{paddingTop: 10}}>
+
+        <DoubleClick
+          singleTap={() => {
+            console.log("single tap");
+          }}
+          doubleTap={() => {
+            console.log("double tap");
+            this.toggleShowRenameList();
+          }}
+          delay={200}>
+          <View style={{height: 44, alignItems: 'center', backgroundColor: Colors.logoLightColor}}>
+            <Text style={{
+              fontSize: 18,
+              fontWeight: '500',
+              padding: 13,
+              color: Colors.logoText}}>
+                {this.state.currentList.label}
+            </Text>
+          </View>
+        </DoubleClick>
+        <RenameList
+          onUpdate={this.onListNameUpdate}
+          initValue={this.state.currentList.label}
+          show={this.state.showRenameList}
+          toggleShow={this.toggleShowRenameList}
+        />
+        </View>
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           scrollEventThrottle={16}
-          onScroll={Animated.event(
-           [{nativeEvent: {contentOffset: {y: this.state.scrollY}}}]
-         )}
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
           keyboardDismissMode='on-drag'
@@ -148,7 +199,7 @@ export default class NewListScreen extends React.Component {
 
           {
             this.state.items
-            .filter(item => !item.done || this.state.showDone)
+            .filter(item => !item.done || this.state.currentList.showDone)
             .map(item =>
               <TodoItem key={item.key}
                 item={item}
@@ -163,56 +214,22 @@ export default class NewListScreen extends React.Component {
             <Button
               color={Colors.logoMainColor}
               onPress={this.toggleShowDoneItems}
-              title={this.state.showDone ? "Hide done" : "Show done"}/>
+              title={this.state.currentList.showDone ? "Hide done" : "Show done"}/>
           }
           </View>
         </ScrollView>
-        <Animated.View style={[styles.header, {height: headerHeight}]}>
-          <View style={styles.welcomeContainer}>
-            <Image
-              source={
-                __DEV__
-                  ? require('../assets/images/icon.png')
-                  : require('../assets/images/icon_trans.png')
-              }
-              style={styles.welcomeImage}
-            />
-          </View>
-
-          <View style={styles.textInputContainer}>
-            <View style={{
-                flexDirection: 'row',
-                height: 60,
-                width: 60,
-                flexGrow: 1,
-                borderWidth: 1,
-                borderColor: Colors.logoLightColor,
-              }}>
-              <TextInput
-                 value={this.state.text}
-                 clearButtonMode='while-editing'
-                 autoFocus={true}
-                 style={styles.textInputField}
-                 placeholder="Type here to add item!"
-                 onChangeText={(text) => this.setState({text: text})}
-               />
-            </View>
-           <TouchableHighlight onPress={this.addItem} underlayColor="white" style={styles.buttonWrapper}>
-               <View style={styles.button}>
-                  <Text style={styles.buttonText}>Add note</Text>
-                </View>
-             </TouchableHighlight>
-          </View>
-        </Animated.View>
-
-      </View>
+        <View style={[styles.header]}>
+          <TextEdit
+            onSave={this.addItem}
+            initValue=''
+            saveLabel='Add note'
+            textInputPlaceholder='Type here to add item!'
+          />
+        </View>
+      </KeyboardAvoidingView>
     );
   }
 }
-
-const HEADER_MAX_HEIGHT = 210;
-const HEADER_MIN_HEIGHT = 100;
-const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 
 const styles = StyleSheet.create({
   container: {
@@ -223,68 +240,14 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
     backgroundColor: Colors.tabBar,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.tabIconDefault,
-    overflow: 'hidden',
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    minHeight: 50,
-    height: '35%',
-    marginTop: 40,
-    marginBottom: 20,
-    // backgroundColor: 'green',
-  },
-  welcomeImage: {
-    minHeight: 50,
-    height: '100%',
-    resizeMode: 'contain',
-    // backgroundColor: 'skyblue',
-    marginTop: 3,
-    marginBottom: 5,
-    marginLeft: -10,
+    borderTopWidth: 1,
+    borderTopColor: Colors.tabIconDefault,
   },
   listContainer: {
-    marginTop: HEADER_MAX_HEIGHT,
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 10,
-    paddingTop: 10,
   },
-  textInputContainer: {
-    paddingLeft: 15,
-    paddingRight: 15,
-    paddingBottom: 10,
-    //paddingTop: 10,
-    flexDirection: 'row',
-    // width: '90%',
-    flexWrap:'nowrap'
-  },
-  textInputField: {
-    textAlign: 'center',
-    flexGrow: 1
-  },
-  buttonWrapper: {
-    height: 60,
-  },
-  button: {
-    marginBottom: 30,
-    height: 60,
-    alignItems: 'center',
-    borderColor: Colors.logoLightColor,
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    backgroundColor: Colors.logoLightColor,
-  },
-  buttonText: {
-    padding: 20,
-    // fontFamily: "Expletus Sans",
-    fontWeight: '500',
-    color: Colors.logoText
-  },
+
 });

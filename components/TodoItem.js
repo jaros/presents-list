@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, Switch, TouchableHighlight, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-class ActionIcon extends React.Component {
+export class ActionIcon extends React.Component {
   render() {
     return (
     <TouchableHighlight
@@ -53,7 +53,7 @@ export default class TodoItem extends React.Component {
           <Text style={ this.textStyle() }>{this.props.item.text}</Text>
         </View>
 
-        <ActionIcon icon='ios-close-circle-outline' click={() => {
+        <ActionIcon icon='ios-remove-circle-outline' click={() => {
           console.log('delete a note', this.props.item.key);
           this.props.onDelete(this.props.item.key);
         }}

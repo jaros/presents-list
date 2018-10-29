@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import { createStackNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
 import NewListScreen from '../screens/NewListScreen';
@@ -9,12 +9,12 @@ import AboutScreen from '../screens/AboutScreen';
 
 import Colors from '../constants/Colors';
 
-const NewListStack = createStackNavigator({
+const ActiveListStack = createStackNavigator({
   New: NewListScreen,
 });
 
-NewListStack.navigationOptions = {
-  tabBarLabel: 'My list',
+ActiveListStack.navigationOptions = {
+  tabBarLabel: 'Active',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -32,7 +32,7 @@ const ListsStack = createStackNavigator({
 });
 
 ListsStack.navigationOptions = {
-  tabBarLabel: 'Lists',
+  tabBarLabel: 'My Lists',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -55,16 +55,26 @@ AboutStack.navigationOptions = {
   ),
 };
 
-export default createBottomTabNavigator({
-  NewListStack,
-  // ListsStack,
+export default createMaterialTopTabNavigator({
+  ActiveListStack,
+  ListsStack,
   AboutStack,
 }, {
+    // initialRouteName: 'ActiveListStack',
+    // tabBarPosition: 'bottom',
+    swipeEnabled: true,
+    animationEnabled: true,
+    lazy: false,
     tabBarOptions: {
-        showLabel: true, // hide labels
+        showLabel: true,
+        showIcon: false,
         activeTintColor: Colors.logoMainColor, // active icon color
         inactiveTintColor: Colors.tabIconDefault,  // inactive icon color
+        indicatorStyle: {
+          backgroundColor: Colors.logoMainColor,
+        },
         style: {
+            paddingTop: 30,
             backgroundColor: Colors.tabBar // TabBar background
         }
     }
