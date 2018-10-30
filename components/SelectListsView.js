@@ -84,7 +84,7 @@ export default class SelectListsView extends React.Component {
   deleteList = (id) => {
     this.setState(previousState => {
       const links = previousState.metaList.links.filter(obj => obj.id !== id);
-      
+
       const active = id !== previousState.metaList.active
         ? previousState.metaList.active // remain current active
         : links.length !== 0 ? links[0].id : -1; // take  first from the rest
@@ -142,7 +142,7 @@ export default class SelectListsView extends React.Component {
             style={{flex: 1, overflow: 'hidden', }}
             onPress={this._handlePressListLink(link)}>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 15}}>
                 <View style={styles.optionIconContainer}>
                   <Ionicons name="ios-list" size={22} color={link.id == this.state.metaList.active ? "#000" : "#ccc"} />
                 </View>
@@ -168,17 +168,17 @@ export default class SelectListsView extends React.Component {
                   <ActionIcon
                     icon='ios-create'
                     click={() => this.toggleShowRenameList(link.id)}
-                    color={'dodgerblue'}
+                    color='#1284f7'
                   />
                 </View>
                 <View style={styles.optionIconContainer}>
                   <ActionIcon
-                    icon='ios-remove-circle-outline'
+                    icon='ios-remove-circle'
                     click={() => {
                     console.log('delete a list', link.id);
                     this.deleteList(link.id);
                   }}
-                  color='red'/>
+                  color='#ff3b30'/>
                 </View>
               </View>
               }
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fdfdfd',
     alignItems: 'center',
     height: 44,
-    paddingHorizontal: 15,
+    paddingLeft: 15,
     //paddingVertical: 15,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#EDEDED',
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.logoLightColor,
     alignItems: 'center',
     height: 44,
-    paddingHorizontal: 15,
+    paddingLeft: 15,
     //paddingVertical: 15,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.logoMainColor,

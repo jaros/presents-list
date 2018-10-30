@@ -9,7 +9,12 @@ export class ActionIcon extends React.Component {
     <TouchableHighlight
       onPress={this.props.click}
       underlayColor="white">
-      <Ionicons name={this.props.icon} size={44} color={this.props.color || styles.itemColor} />
+      <View style={{width: 44, height: 44, alignItems: 'center', justifyContent: 'center'}}>
+        <Ionicons
+          name={this.props.icon}
+          size={this.props.size || 28}
+          color={this.props.color || styles.itemColor} />
+      </View>
     </TouchableHighlight>
     )
   }
@@ -50,10 +55,10 @@ export default class TodoItem extends React.Component {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center'}}>
         {
-          this.state.done && <ActionIcon icon='ios-checkbox-outline' click={this.toggleDone} color='#d9d9d9'/>
+          this.state.done && <ActionIcon icon='ios-checkbox-outline' size={44} click={this.toggleDone} color='#d9d9d9'/>
         }
         {
-          !this.state.done && <ActionIcon icon='ios-square-outline' click={this.toggleDone}/>
+          !this.state.done && <ActionIcon icon='ios-square-outline' size={44} click={this.toggleDone}/>
         }
 
         <View style={{
@@ -79,11 +84,11 @@ export default class TodoItem extends React.Component {
           </TouchableHighlight>
         </View>
 
-        <ActionIcon icon='ios-remove-circle-outline' click={() => {
+        <ActionIcon icon='ios-remove-circle' click={() => {
           console.log('delete a note', this.props.item.key);
           this.props.onDelete(this.props.item.key);
         }}
-        color='red'/>
+        color='#ff3b30'/>
 
         <RenameList
           onUpdate={this.onTextUpdate}
