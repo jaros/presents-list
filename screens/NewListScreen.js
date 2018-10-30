@@ -169,6 +169,7 @@ export default class NewListScreen extends React.Component {
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
           keyboardDismissMode='on-drag'
+          keyboardShouldPersistTaps='always'
           >
 
           <View style={styles.listContainer}>

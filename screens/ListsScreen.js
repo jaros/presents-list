@@ -9,7 +9,9 @@ export default class ListsScreen extends React.Component {
 
   render() {
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container} 
+        keyboardShouldPersistTaps='always'>
         {/* Go ahead and delete ExpoLinksView and replace it with your
            * content, we just wanted to provide you with some helpful links */}
         <SelectListsView navigation={this.props.navigation}/>
