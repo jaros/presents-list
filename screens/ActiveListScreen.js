@@ -15,7 +15,7 @@ import ActiveListTitle from '../components/ActiveListTitle';
 import { Header } from 'react-navigation';
 import { todoItemsMetaList } from '../components/SelectListsView';
 
-export default class NewListScreen extends React.Component {
+export default class ActiveListScreen extends React.Component {
   static navigationOptions = {
     header: null,
   };

@@ -3,14 +3,14 @@ import { Platform } from 'react-native';
 import { createStackNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
-import NewListScreen from '../screens/NewListScreen';
+import ActiveListScreen from '../screens/ActiveListScreen';
 import ListsScreen from '../screens/ListsScreen';
 import AboutScreen from '../screens/AboutScreen';
 
 import Colors from '../constants/Colors';
 
 const ActiveListStack = createStackNavigator({
-  New: NewListScreen,
+  Active: ActiveListScreen,
 });
 
 ActiveListStack.navigationOptions = {
