@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, Button, StyleSheet, Image, Text, View } from 'react-native';
+import { AsyncStorage, Button, StyleSheet, Image, Text, View, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Touchable from 'react-native-platform-touchable';
 import Colors from '../constants/Colors';
@@ -75,6 +75,22 @@ export default class SelectListsView extends React.Component {
       }
     })
     .catch(err => console.log(err));
+  };
+
+  itemsToList = (items) => {
+    const labels = JSON.parse(items).map(item => item.text);
+    let result = '';
+    labels.forEach(label => result += (`- ${label}\n`));
+    return result;
+  };
+
+  getListContent = async (listId) => {
+    try {
+      return this.itemsToList(await AsyncStorage.getItem('TODO_ITEMS_' + listId));
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   };
 
   saveMetaList = () => {
@@ -158,9 +174,15 @@ export default class SelectListsView extends React.Component {
                 <View style={styles.optionIconContainer}>
                   <ActionIcon
                     icon='ios-paper-plane'
-                    click={() => {
-                    console.log('share a list', link.id);
-                    //this.deleteList(link.id);
+                    click={ async () => {
+                    const listContent = await this.getListContent(link.id);
+                    Share.share(
+                      {
+                        title: `Share a list ${link.label} with friend`,
+                        message: await this.getListContent(link.id),
+                        url: 'https://github.com/jaros/check-list',
+                      }
+                    );
                   }}
                   />
               </View>
