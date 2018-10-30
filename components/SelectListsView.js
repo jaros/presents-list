@@ -174,6 +174,7 @@ export default class SelectListsView extends React.Component {
                 <View style={styles.optionIconContainer}>
                   <ActionIcon
                     icon='ios-paper-plane'
+                    color='#1284f7'
                     click={ async () => {
                     const listContent = await this.getListContent(link.id);
                     Share.share(
