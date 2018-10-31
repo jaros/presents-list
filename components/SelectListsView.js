@@ -123,10 +123,7 @@ export default class SelectListsView extends React.Component {
     return (
       <View style={styles.container}>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text style={styles.optionsTitleText}>
-            Lists
-          </Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'flex-end'}}>
           <View style={{paddingRight: 10}}>
             {!this.state.edit &&
               <Button
@@ -276,12 +273,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 15,
     paddingBottom: 15,
-  },
-  optionsTitleText: {
-    fontSize: 16,
-    marginLeft: 15,
-    marginTop: 9,
-    marginBottom: 12,
   },
   optionsActive: {
     backgroundColor: Colors.logoLightColor,

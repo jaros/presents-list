@@ -28,7 +28,7 @@ export default class TextEdit extends React.Component {
       <View style={styles.textInputContainer}>
         <View style={{
             flexDirection: 'row',
-            height: 60,
+            height: 45,
             width: 60,
             flexGrow: 1,
             borderWidth: 1,
@@ -43,7 +43,7 @@ export default class TextEdit extends React.Component {
              onChangeText={(text) => this.setState({text: text})}
            />
         </View>
-          <TouchableHighlight onPress={this.onSavePressed} underlayColor="white" style={styles.buttonWrapper}>
+          <TouchableHighlight onPress={this.onSavePressed} underlayColor="white">
              <View style={styles.button}>
                 <Text style={styles.buttonText}>{this.props.saveLabel}</Text>
               </View>
@@ -55,7 +55,7 @@ export default class TextEdit extends React.Component {
 
 const styles = StyleSheet.create({
   textInputContainer: {
-    padding: 15,
+    padding: 10,
     flexDirection: 'row',
     flexWrap:'nowrap'
   },
@@ -64,19 +64,20 @@ const styles = StyleSheet.create({
     flexGrow: 1
   },
   buttonWrapper: {
-    height: 60,
+    height: 45,
   },
   button: {
-    marginBottom: 30,
-    height: 60,
+    //marginBottom: 10,
+    height: 45,
     alignItems: 'center',
+    justifyContent: 'center',
     borderColor: Colors.logoLightColor,
     borderWidth: 1,
     borderLeftWidth: 0,
     backgroundColor: Colors.logoLightColor,
   },
   buttonText: {
-    padding: 20,
+    paddingHorizontal: 10,
     fontWeight: '500',
     color: Colors.logoText
   },
