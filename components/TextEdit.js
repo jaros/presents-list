@@ -28,7 +28,7 @@ export default class TextEdit extends React.Component {
       <View style={styles.textInputContainer}>
         <View style={{
             flexDirection: 'row',
-            height: 45,
+            height: 35,
             width: 60,
             flexGrow: 1,
             borderWidth: 1,
@@ -63,12 +63,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     flexGrow: 1
   },
-  buttonWrapper: {
-    height: 45,
-  },
   button: {
-    //marginBottom: 10,
-    height: 45,
+    height: 35,
     alignItems: 'center',
     justifyContent: 'center',
     borderColor: Colors.logoLightColor,
