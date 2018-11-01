@@ -24,12 +24,18 @@ export default class ActiveListTitle extends React.Component {
         <DoubleClick
           doubleTap={this.toggleShowRenameList}
           delay={200}>
-          <View style={{height: 44, alignItems: 'center', backgroundColor: Colors.logoLightColor}}>
+          <View style={{
+            marginHorizontal: 20,
+            padding: 0,
+            borderBottomColor: Colors.tabIconDefault,
+            borderBottomWidth: 1,
+            alignItems: 'center'
+          }}>
             <Text style={{
               fontSize: 18,
               fontWeight: '500',
-              padding: 13,
-              color: Colors.logoText}}>
+              padding: 5,
+              color: Colors.tabIconDefault}}>
                 {this.props.title}
             </Text>
           </View>
