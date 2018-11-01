@@ -131,7 +131,6 @@ export default class ActiveListScreen extends React.Component {
           .concat(previousState.items)
       }
     }, this.storeItems);
-    // Alert.alert('You tapped the button!');
   };
 
 

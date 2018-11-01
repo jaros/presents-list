@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, Button, StyleSheet, Image, Text, View, Share } from 'react-native';
+import { Alert, AsyncStorage, Button, StyleSheet, Image, Text, View, Share } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Touchable from 'react-native-platform-touchable';
 import Colors from '../constants/Colors';
@@ -98,7 +98,8 @@ export default class SelectListsView extends React.Component {
   };
 
   deleteList = (id) => {
-    this.setState(previousState => {
+
+    const doDelete = () => this.setState(previousState => {
       const links = previousState.metaList.links.filter(obj => obj.id !== id);
 
       const active = id !== previousState.metaList.active
@@ -117,6 +118,18 @@ export default class SelectListsView extends React.Component {
         AsyncStorage.removeItem('TODO_ITEMS');
       }
     });
+
+    Alert.alert('Confirm list delete', 'Remove the list?', [
+      {
+        text: 'Yes',
+        onPress: doDelete,
+      }, {
+        text: 'Cancel',
+        onPress: () => console.log('cancelled'),
+        type: 'cancel'
+      }]
+    );
+
   }
 
   render() {
