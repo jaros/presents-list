@@ -77,7 +77,7 @@ export default class ActiveListScreen extends React.Component {
   };
 
   storeItems = () => {
-    AsyncStorage.setItem(this.listKey(), JSON.stringify(this.state.items));
+    return AsyncStorage.setItem(this.listKey(), JSON.stringify(this.state.items));
   };
 
   toggleShowDoneItems = () => {
@@ -124,13 +124,12 @@ export default class ActiveListScreen extends React.Component {
   addItem = (newValue) => {
     this.setState(previousState => {
       return {
-        items: [{
-            key: new Date().getTime(),
-            text: newValue
-          }]
-          .concat(previousState.items)
+        items: previousState.items.concat([{
+                key: new Date().getTime(),
+                text: newValue
+                }])
       }
-    }, this.storeItems);
+    }, () => this.storeItems().then(() => this.scrollView.scrollToEnd()));
   };
 
 
@@ -169,6 +168,7 @@ export default class ActiveListScreen extends React.Component {
           contentContainerStyle={styles.contentContainer}
           keyboardDismissMode='on-drag'
           keyboardShouldPersistTaps='always'
+          ref={(ref) => { this.scrollView = ref; }}
           >
 
           <View style={styles.listContainer}>
