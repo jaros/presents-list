@@ -55,10 +55,10 @@ export default class TodoItem extends React.Component {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center'}}>
         {
-          this.state.done && <ActionIcon icon='ios-checkbox-outline' size={44} click={this.toggleDone} color='#d9d9d9'/>
+          this.state.done && <ActionIcon icon='ios-checkbox-outline' size={24} click={this.toggleDone} color='#d9d9d9'/>
         }
         {
-          !this.state.done && <ActionIcon icon='ios-square-outline' size={44} click={this.toggleDone}/>
+          !this.state.done && <ActionIcon icon='ios-square-outline' size={24} click={this.toggleDone}/>
         }
 
         <View style={{
@@ -88,6 +88,7 @@ export default class TodoItem extends React.Component {
           console.log('delete a note', this.props.item.key);
           this.props.onDelete(this.props.item.key);
         }}
+        size={24}
         color='#ff3b30'/>
 
         <RenameList
