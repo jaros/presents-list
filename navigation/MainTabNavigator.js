@@ -74,7 +74,7 @@ export default createMaterialTopTabNavigator({
           backgroundColor: Colors.logoMainColor,
         },
         style: {
-            paddingTop: 30,
+            paddingTop: 60,
             backgroundColor: Colors.tabBar // TabBar background
         }
     }

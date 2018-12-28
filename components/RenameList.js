@@ -17,7 +17,7 @@ export default class RenameList extends React.Component {
         visible={this.props.show}
         presentationStyle='pageSheet'
         >
-        <View style={{marginTop: 22}}>
+        <View style={{marginTop: 60}}>
           <TextEdit
             onSave={(value) => {
               this.props.onUpdate(value);

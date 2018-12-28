@@ -40,7 +40,7 @@ export default class ActiveListScreen extends React.Component {
 
   listKey = () => {
     return 'TODO_ITEMS_' + this.state.currentList.id;
-  }
+  };
 
   loadStoredItems = () => {
       AsyncStorage.getItem(this.listKey()).then(value => {
@@ -92,7 +92,7 @@ export default class ActiveListScreen extends React.Component {
   };
 
   deleteItem = (key) => {
-    console.log('deleteting item...', key)
+    // console.log('deleteting item...', key)
     this.setState(previousState => {
       return {
         items: previousState.items.filter(item => item.key !== key)
@@ -119,7 +119,7 @@ export default class ActiveListScreen extends React.Component {
 
   changeItemText = (key, value) => {
     this.updateItem(key, (item) => item.text = value);
-  }
+  };
 
   addItem = (newValue) => {
     this.setState(previousState => {
@@ -198,6 +198,7 @@ export default class ActiveListScreen extends React.Component {
         <View style={[styles.header]}>
           <TextEdit
             onSave={this.addItem}
+            onFocus={() => { setTimeout(this.scrollView.scrollToEnd, 100); console.log('scroll to the end'); } }
             initValue=''
             saveLabel='Add note'
             textInputPlaceholder='Type here to add item!'
@@ -220,6 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.tabBar,
     borderTopWidth: 1,
     borderTopColor: Colors.tabIconDefault,
+    paddingBottom: 20
   },
   listContainer: {
     paddingLeft: 15,
