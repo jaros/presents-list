@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 15,
-    paddingBottom: 15,
+    paddingBottom: 60,
   },
   optionsActive: {
     backgroundColor: Colors.logoLightColor,
@@ -298,7 +298,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#fdfdfd',
-    alignItems: 'center',
     height: 44,
     paddingLeft: 15,
     //paddingVertical: 15,
@@ -310,7 +309,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: Colors.logoLightColor,
-    alignItems: 'center',
     height: 44,
     paddingLeft: 15,
     //paddingVertical: 15,
