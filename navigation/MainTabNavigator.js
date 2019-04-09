@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Keyboard, Platform } from 'react-native';
 import { createStackNavigator, createMaterialTopTabNavigator } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
@@ -13,8 +13,14 @@ const ActiveListStack = createStackNavigator({
   Active: ActiveListScreen,
 });
 
+const hideKeyboard = routeName => ({navigation}) => {
+  Keyboard.dismiss();
+  navigation.navigate(routeName);
+};
+
 ActiveListStack.navigationOptions = {
   tabBarLabel: 'Active',
+  tabBarOnPress: hideKeyboard('ActiveListStack'),
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -33,6 +39,7 @@ const ListsStack = createStackNavigator({
 
 ListsStack.navigationOptions = {
   tabBarLabel: 'My Lists',
+  tabBarOnPress: hideKeyboard('ListsStack'),
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -47,6 +54,7 @@ const AboutStack = createStackNavigator({
 
 AboutStack.navigationOptions = {
   tabBarLabel: 'About',
+  tabBarOnPress: hideKeyboard('AboutStack'),
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
