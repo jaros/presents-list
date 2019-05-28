@@ -62,19 +62,23 @@ export default class SelectListsView extends React.Component {
     }, this.saveMetaList);
   };
 
-  loadMetaList = () => {
-    return AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
+  loadMetaList = async () => {
+    try {
+      const value = await AsyncStorage.getItem('TODO_ITEMS_META_LIST');
       if (value) {
         this.setState({
           metaList: JSON.parse(value)
         });
-      } else { // init first time
+      }
+      else { // init first time
         this.setState({
           metaList: todoItemsMetaList
         }, this.saveMetaList);
       }
-    })
-      .catch(err => console.log(err));
+    }
+    catch (err) {
+      return console.log(err);
+    }
   };
 
   itemsToList = (items) => {
@@ -140,7 +144,7 @@ export default class SelectListsView extends React.Component {
         label: 'New list',
         showDone: true,
       }
-      oldLinks.push(newList);
+      oldLinks.unshift(newList);
       return {
         metaList: {
           links: oldLinks,
@@ -150,7 +154,7 @@ export default class SelectListsView extends React.Component {
     }, () => {
       this.saveMetaList();
       let links = this.state.metaList.links;
-      this._handlePressListLink(links[links.length - 1])();
+      this._handlePressListLink(links[0])();
     });
   };
 
