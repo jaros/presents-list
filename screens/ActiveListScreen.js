@@ -12,7 +12,6 @@ import {
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
 import TextEdit from '../components/TextEdit';
-import ActiveListTitle from '../components/ActiveListTitle';
 import { Header } from 'react-navigation';
 import { todoItemsMetaList } from '../components/SelectListsView';
 import TodoItemEdit from '../components/TodoItemEdit';
@@ -130,7 +129,8 @@ export default class ActiveListScreen extends React.Component {
       return {
         items: previousState.items.concat([{
           key: new Date().getTime(),
-          text: newValue
+          text: newValue,
+          order: previousState.items.length * 100,
         }])
       }
     }, () => this.storeItems().then(() => this.scrollView.scrollToEnd()));
