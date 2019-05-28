@@ -149,6 +149,43 @@ export default class ActiveListScreen extends React.Component {
     }, this.saveMetaList);
   };
 
+  showActiveTodos = () => {
+    return <ScrollView
+      showsVerticalScrollIndicator={false}
+      scrollEventThrottle={16}
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      keyboardDismissMode='on-drag'
+      keyboardShouldPersistTaps='always'
+      ref={(ref) => { this.scrollView = ref; }}
+    >
+
+      <View style={styles.listContainer}>
+
+        {
+          this.state.items
+            .filter(item => !item.done || this.state.currentList.showDone)
+            .map(item =>
+              <TodoItem key={item.key}
+                item={item}
+                onDelete={this.deleteItem}
+                onDone={this.toggleItem}
+                onChange={this.changeItemText}
+              />
+            )
+        }
+
+        {
+          (this.state.items.filter(it => it.done) || []).length !== 0 &&
+          <Button
+            color={Colors.logoMainColor}
+            onPress={this.toggleShowDoneItems}
+            title={this.state.currentList.showDone ? "Hide done" : "Show done"} />
+        }
+      </View>
+    </ScrollView>
+  }
+
   render() {
     return (
       <KeyboardAvoidingView
@@ -179,58 +216,28 @@ export default class ActiveListScreen extends React.Component {
             onPress={() => {
               console.log("show edit")
               Keyboard.dismiss()
-              this.setState({
-                isEdit: true
-              })
+              this.setState((state, props) => ({ isEdit: !state.isEdit }));
             }}
-            title="Edit"
+            title={this.state.isEdit ? "Done" : "Edit"}
             accessibilityLabel="Edit"
           />
         </View>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          scrollEventThrottle={16}
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}
-          keyboardDismissMode='on-drag'
-          keyboardShouldPersistTaps='always'
-          ref={(ref) => { this.scrollView = ref; }}
-        >
+        {this.state.isEdit === false &&
+          this.showActiveTodos()
+        }
 
-          <View style={styles.listContainer}>
-
-            {
-              this.state.items
-                .filter(item => !item.done || this.state.currentList.showDone)
-                .map(item =>
-                  <TodoItem key={item.key}
-                    item={item}
-                    onDelete={this.deleteItem}
-                    onDone={this.toggleItem}
-                    onChange={this.changeItemText}
-                  />
-                )
-            }
-
-            {
-              (this.state.items.filter(it => it.done) || []).length !== 0 &&
-              <Button
-                color={Colors.logoMainColor}
-                onPress={this.toggleShowDoneItems}
-                title={this.state.currentList.showDone ? "Hide done" : "Show done"} />
-            }
+        {this.state.isEdit === false &&
+          <View style={[styles.header]}>
+            <TextEdit
+              onSave={this.addItem}
+              onFocus={() => { setTimeout(this.scrollView.scrollToEnd, 100); console.log('scroll to the end'); }}
+              initValue=''
+              saveLabel='Add note'
+              textInputPlaceholder='Type here to add item!'
+            />
           </View>
-        </ScrollView>
-        <View style={[styles.header]}>
-          <TextEdit
-            onSave={this.addItem}
-            onFocus={() => { setTimeout(this.scrollView.scrollToEnd, 100); console.log('scroll to the end'); }}
-            initValue=''
-            saveLabel='Add note'
-            textInputPlaceholder='Type here to add item!'
-          />
-        </View>
+        }
       </KeyboardAvoidingView>
     );
   }
