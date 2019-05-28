@@ -18,6 +18,7 @@
     "react": "16.3.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-30.0.0.tar.gz",
     "react-native-double-tap": "^1.0.1",
+    "react-native-sortable-list": "0.0.23",
     "react-navigation": "^2.16.0"
   },
   "devDependencies": {

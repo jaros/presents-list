@@ -7,6 +7,7 @@ import {
   Text,
   View,
   KeyboardAvoidingView,
+  Keyboard,
 } from 'react-native';
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
@@ -26,6 +27,7 @@ export default class ActiveListScreen extends React.Component {
       items: [],
       metaList: {},
       currentList: {},
+      isEdit: false,
     };
 
     this.loadMetaList();
@@ -43,32 +45,32 @@ export default class ActiveListScreen extends React.Component {
   };
 
   loadStoredItems = () => {
-      AsyncStorage.getItem(this.listKey()).then(value => {
-        if (value) {
-          this.setState({
-            items: JSON.parse(value)
-          });
-        }
-      }).catch(err => console.log(err));
+    AsyncStorage.getItem(this.listKey()).then(value => {
+      if (value) {
+        this.setState({
+          items: JSON.parse(value)
+        });
+      }
+    }).catch(err => console.log(err));
   };
 
   loadMetaList = () => {
-      AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
-        if (value && JSON.parse(value).links.length !== 0) {
-          const meta = JSON.parse(value);
-          this.setState({
-            metaList: meta,
-            currentList: meta.links.find(it => it.id === meta.active),
-            items: []
-          }, this.loadStoredItems);
-        }  else { // init first time
-          this.setState({
-            metaList: todoItemsMetaList,
-            currentList: todoItemsMetaList.links[0],
-            items: []
-          }, this.saveMetaList);
-        }
-      }).catch(err => console.log(err));
+    AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
+      if (value && JSON.parse(value).links.length !== 0) {
+        const meta = JSON.parse(value);
+        this.setState({
+          metaList: meta,
+          currentList: meta.links.find(it => it.id === meta.active),
+          items: []
+        }, this.loadStoredItems);
+      } else { // init first time
+        this.setState({
+          metaList: todoItemsMetaList,
+          currentList: todoItemsMetaList.links[0],
+          items: []
+        }, this.saveMetaList);
+      }
+    }).catch(err => console.log(err));
   };
 
   saveMetaList = () => {
@@ -87,7 +89,7 @@ export default class ActiveListScreen extends React.Component {
       const objIndex = previousState.metaList.links.findIndex((obj => obj.id == previousState.currentList.id));
       previousState.metaList.links[objIndex].showDone = !isShowDone;
 
-      return {metaList: previousState.metaList};
+      return { metaList: previousState.metaList };
     }, this.saveMetaList);
   };
 
@@ -125,9 +127,9 @@ export default class ActiveListScreen extends React.Component {
     this.setState(previousState => {
       return {
         items: previousState.items.concat([{
-                key: new Date().getTime(),
-                text: newValue
-                }])
+          key: new Date().getTime(),
+          text: newValue
+        }])
       }
     }, () => this.storeItems().then(() => this.scrollView.scrollToEnd()));
   };
@@ -154,12 +156,37 @@ export default class ActiveListScreen extends React.Component {
         behavior="padding"
         enabled
         keyboardVerticalOffset={Header.HEIGHT + 35}
-        >
+      >
 
-        <ActiveListTitle
-          onUpdate={this.onListNameUpdate}
-          title={this.state.currentList.label}
-        />
+        <View
+          style={{
+            marginHorizontal: 20,
+            marginVertical: 10,
+            padding: 0,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+        >
+          <Text style={{
+            fontSize: 22,
+            fontWeight: '500',
+            padding: 5,
+            color: Colors.tintColor
+          }}>
+            {this.state.currentList.label}
+          </Text>
+          <Button
+            onPress={() => {
+              console.log("show edit")
+              Keyboard.dismiss()
+              this.setState({
+                isEdit: true
+              })
+            }}
+            title="Edit"
+            accessibilityLabel="Edit"
+          />
+        </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -169,36 +196,36 @@ export default class ActiveListScreen extends React.Component {
           keyboardDismissMode='on-drag'
           keyboardShouldPersistTaps='always'
           ref={(ref) => { this.scrollView = ref; }}
-          >
+        >
 
           <View style={styles.listContainer}>
 
-          {
-            this.state.items
-            .filter(item => !item.done || this.state.currentList.showDone)
-            .map(item =>
-              <TodoItem key={item.key}
-                item={item}
-                onDelete={this.deleteItem}
-                onDone={this.toggleItem}
-                onChange={this.changeItemText}
-                />
-            )
-          }
+            {
+              this.state.items
+                .filter(item => !item.done || this.state.currentList.showDone)
+                .map(item =>
+                  <TodoItem key={item.key}
+                    item={item}
+                    onDelete={this.deleteItem}
+                    onDone={this.toggleItem}
+                    onChange={this.changeItemText}
+                  />
+                )
+            }
 
-          {
-            (this.state.items.filter(it => it.done) || []).length !== 0 &&
-            <Button
-              color={Colors.logoMainColor}
-              onPress={this.toggleShowDoneItems}
-              title={this.state.currentList.showDone ? "Hide done" : "Show done"}/>
-          }
+            {
+              (this.state.items.filter(it => it.done) || []).length !== 0 &&
+              <Button
+                color={Colors.logoMainColor}
+                onPress={this.toggleShowDoneItems}
+                title={this.state.currentList.showDone ? "Hide done" : "Show done"} />
+            }
           </View>
         </ScrollView>
         <View style={[styles.header]}>
           <TextEdit
             onSave={this.addItem}
-            onFocus={() => { setTimeout(this.scrollView.scrollToEnd, 100); console.log('scroll to the end'); } }
+            onFocus={() => { setTimeout(this.scrollView.scrollToEnd, 100); console.log('scroll to the end'); }}
             initValue=''
             saveLabel='Add note'
             textInputPlaceholder='Type here to add item!'
