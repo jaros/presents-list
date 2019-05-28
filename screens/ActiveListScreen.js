@@ -35,8 +35,16 @@ export default class ActiveListScreen extends React.Component {
 
     const willFocusSubscription = this.props.navigation.addListener(
       'willFocus',
-      payload => {
+      () => {
         this.loadMetaList();
+      }
+    );
+
+    this.props.navigation.addListener(
+      'willBlur',
+      () => {
+        this.setState({isEdit: false});
+        console.log('has left active list')
       }
     );
   }
@@ -212,21 +220,16 @@ export default class ActiveListScreen extends React.Component {
     let items = this.state.items.sort((obj1, obj2) => obj1.order - obj2.order)
 
     let onPositonChange = (key, currentOrder) => {
-      console.log("onReleaseRow", key, currentOrder);
       let item = items[key];
-      console.log("updated item:", item ) 
       let newIdx = currentOrder.indexOf(key);
-      console.log('new item index:', newIdx);
       let prevItemIdx = newIdx > 0 ? currentOrder[newIdx-1] : -1;
       let nextItemIdx = newIdx < (currentOrder.length -1) ? currentOrder[newIdx+1] : -1;
-      console.log('prevItemIdx', prevItemIdx, 'nextItemIdx', nextItemIdx);
-
+      
       let prevOrder = prevItemIdx !== -1 ? items[prevItemIdx].order : 0;
       let nextOrder = nextItemIdx !== -1 ? items[nextItemIdx].order : (currentOrder.length+1) * 100;
 
       let newItemOrder = (prevOrder + nextOrder) / 2;
       item.order = newItemOrder;
-      console.log('new item order', newItemOrder);
       this.updateItem(item.key, (item) => item.order = newItemOrder);
     }
 
@@ -255,7 +258,7 @@ export default class ActiveListScreen extends React.Component {
           style={{
             marginHorizontal: 20,
             marginVertical: 10,
-            padding: 0,
+            paddingTop: 15,
             flexDirection: 'row',
             justifyContent: 'space-between',
           }}
