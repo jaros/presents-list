@@ -48,12 +48,27 @@ export default class ActiveListScreen extends React.Component {
   loadStoredItems = () => {
     AsyncStorage.getItem(this.listKey()).then(value => {
       if (value) {
-        this.setState({
-          items: JSON.parse(value)
-        });
+        this.assignItems(value);
       }
     }).catch(err => console.log(err));
   };
+
+  assignItems = (jsonValue) => {
+    let list = JSON.parse(jsonValue);
+    if (this.notOrdered(list)) {
+      console.log('adjust list order')
+      list = list.map((item, idx) => ({
+        ...item,
+        order: (idx+1) * 100
+      }));
+      this.storeItems(list);
+    }
+    this.setState({
+      items: list
+    });
+  }
+
+  notOrdered = (list) => list.some(it => it.order === undefined)
 
   loadMetaList = () => {
     AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
@@ -79,8 +94,11 @@ export default class ActiveListScreen extends React.Component {
     AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(this.state.metaList));
   };
 
-  storeItems = () => {
-    return AsyncStorage.setItem(this.listKey(), JSON.stringify(this.state.items));
+  storeItems = (list) => {
+    if (list === undefined) {
+      list = this.state.items
+    }
+    return AsyncStorage.setItem(this.listKey(), JSON.stringify(list));
   };
 
   toggleShowDoneItems = () => {
@@ -130,7 +148,7 @@ export default class ActiveListScreen extends React.Component {
         items: previousState.items.concat([{
           key: new Date().getTime(),
           text: newValue,
-          order: previousState.items.length * 100,
+          order: (previousState.items.length+1) * 100,
         }])
       }
     }, () => this.storeItems().then(() => this.scrollView.scrollToEnd()));
@@ -167,6 +185,10 @@ export default class ActiveListScreen extends React.Component {
         {
           this.state.items
             .filter(item => !item.done || this.state.currentList.showDone)
+            .sort(function(obj1, obj2) {
+              // Ascending
+              return obj1.order - obj2.order;
+            })
             .map(item =>
               <TodoItem key={item.key}
                 item={item}
@@ -187,10 +209,32 @@ export default class ActiveListScreen extends React.Component {
   }
 
   showEditTodos = () => {
+    let items = this.state.items.sort((obj1, obj2) => obj1.order - obj2.order)
+
+    let onPositonChange = (key, currentOrder) => {
+      console.log("onReleaseRow", key, currentOrder);
+      let item = items[key];
+      console.log("updated item:", item ) 
+      let newIdx = currentOrder.indexOf(key);
+      console.log('new item index:', newIdx);
+      let prevItemIdx = newIdx > 0 ? currentOrder[newIdx-1] : -1;
+      let nextItemIdx = newIdx < (currentOrder.length -1) ? currentOrder[newIdx+1] : -1;
+      console.log('prevItemIdx', prevItemIdx, 'nextItemIdx', nextItemIdx);
+
+      let prevOrder = prevItemIdx !== -1 ? items[prevItemIdx].order : 0;
+      let nextOrder = nextItemIdx !== -1 ? items[nextItemIdx].order : (currentOrder.length+1) * 100;
+
+      let newItemOrder = (prevOrder + nextOrder) / 2;
+      item.order = newItemOrder;
+      console.log('new item order', newItemOrder);
+      this.updateItem(item.key, (item) => item.order = newItemOrder);
+    }
+
     return <SortableList
       style={styles.container}
       contentContainerStyle={styles.listContainer}
-      data={this.state.items}
+      data={items}
+      onReleaseRow={onPositonChange}
       renderRow={this._renderRow} />
   }
 
@@ -228,6 +272,9 @@ export default class ActiveListScreen extends React.Component {
             onPress={() => {
               console.log("show edit")
               Keyboard.dismiss()
+              if (this.state.isEdit) {
+                this.state.items.sort((obj1, obj2) => obj1.order - obj2.order).forEach(it => console.log(it))
+              }
               this.setState((state, props) => ({ isEdit: !state.isEdit }));
             }}
             title={this.state.isEdit ? "Done" : "Edit"}
