@@ -70,6 +70,10 @@ export class Row extends React.Component {
     this.props.onChange(this.props.data.key, value);
   };
 
+  textStyle() {
+    return this.props.data.done ? [styles.done] : [styles.itemColor];
+  }
+
   render() {
     const { data, active } = this.props;
 
@@ -78,7 +82,7 @@ export class Row extends React.Component {
         styles.row,
         this._style,
       ]}>
-        <Text>{data.text}</Text>
+        <Text style={this.textStyle()}>{data.text}</Text>
 
         <View style={{
           flexDirection: 'row',
@@ -126,6 +130,15 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 10,
+  },
+
+  done: {
+    color: '#d9d9d9',
+    textDecorationLine: 'line-through',
+    fontStyle: 'italic',
+  },
+  itemColor: {
+    color: '#383636'
   },
 
   row: {
