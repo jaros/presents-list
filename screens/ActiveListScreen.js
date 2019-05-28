@@ -15,6 +15,8 @@ import TextEdit from '../components/TextEdit';
 import ActiveListTitle from '../components/ActiveListTitle';
 import { Header } from 'react-navigation';
 import { todoItemsMetaList } from '../components/SelectListsView';
+import { Row } from '../components/EditActiveListView';
+import SortableList from 'react-native-sortable-list';
 
 export default class ActiveListScreen extends React.Component {
   static navigationOptions = {
@@ -168,22 +170,32 @@ export default class ActiveListScreen extends React.Component {
             .map(item =>
               <TodoItem key={item.key}
                 item={item}
-                onDelete={this.deleteItem}
                 onDone={this.toggleItem}
-                onChange={this.changeItemText}
               />
             )
         }
 
-        {
+        {/* {
           (this.state.items.filter(it => it.done) || []).length !== 0 &&
           <Button
             color={Colors.logoMainColor}
             onPress={this.toggleShowDoneItems}
             title={this.state.currentList.showDone ? "Hide done" : "Show done"} />
-        }
+        } */}
       </View>
     </ScrollView>
+  }
+
+  showEditTodos = () => {
+    return <SortableList
+      style={styles.container}
+      contentContainerStyle={styles.listContainer}
+      data={this.state.items}
+      renderRow={this._renderRow} />
+  }
+
+  _renderRow = ({ data, active }) => {
+    return <Row data={data} active={active} onDelete={this.deleteItem} onChange={this.changeItemText} />
   }
 
   render() {
@@ -223,8 +235,11 @@ export default class ActiveListScreen extends React.Component {
           />
         </View>
 
-        {this.state.isEdit === false &&
+        {!this.state.isEdit &&
           this.showActiveTodos()
+        }
+        {this.state.isEdit &&
+          this.showEditTodos()
         }
 
         {this.state.isEdit === false &&
