@@ -137,10 +137,11 @@ export default class SelectListsView extends React.Component {
   }
 
   addNewList = () => {
+    const id = new Date().getTime();
     this.setState(previousState => {
       oldLinks = previousState.metaList.links;
       let newList = {
-        id: new Date().getTime(),
+        id,
         label: 'New list',
         showDone: true,
       }
@@ -153,8 +154,9 @@ export default class SelectListsView extends React.Component {
       };
     }, () => {
       this.saveMetaList();
-      let links = this.state.metaList.links;
-      this._handlePressListLink(links[0])();
+      this.toggleShowRenameList(id);
+      //let links = this.state.metaList.links;
+      //this._handlePressListLink(links[0])();
     });
   };
 
