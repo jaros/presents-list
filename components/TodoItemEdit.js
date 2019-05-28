@@ -11,7 +11,7 @@ import Colors from '../constants/Colors';
 import { ActionIcon } from './TodoItem';
 import RenameList from './RenameList';
 
-export class Row extends React.Component {
+export default class TodoItemEdit extends React.Component {
 
   constructor(props) {
     super(props);

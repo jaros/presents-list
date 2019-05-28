@@ -15,7 +15,7 @@ import TextEdit from '../components/TextEdit';
 import ActiveListTitle from '../components/ActiveListTitle';
 import { Header } from 'react-navigation';
 import { todoItemsMetaList } from '../components/SelectListsView';
-import { Row } from '../components/EditActiveListView';
+import TodoItemEdit from '../components/TodoItemEdit';
 import SortableList from 'react-native-sortable-list';
 
 export default class ActiveListScreen extends React.Component {
@@ -195,7 +195,7 @@ export default class ActiveListScreen extends React.Component {
   }
 
   _renderRow = ({ data, active }) => {
-    return <Row data={data} active={active} onDelete={this.deleteItem} onChange={this.changeItemText} />
+    return <TodoItemEdit data={data} active={active} onDelete={this.deleteItem} onChange={this.changeItemText} />
   }
 
   render() {
