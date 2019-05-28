@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, AsyncStorage, Button, StyleSheet, Image, Text, View, Share } from 'react-native';
+import { Alert, AsyncStorage, Button, StyleSheet, Image, Text, View, Share, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Touchable from 'react-native-platform-touchable';
 import Colors from '../constants/Colors';
@@ -27,7 +27,7 @@ export default class SelectListsView extends React.Component {
       showRenameList: false,
     };
 
-    const willFocusSubscription = this.props.navigation.addListener('willFocus',this.loadMetaList);
+    const willFocusSubscription = this.props.navigation.addListener('willFocus', this.loadMetaList);
   }
 
   activeList = () => {
@@ -74,7 +74,7 @@ export default class SelectListsView extends React.Component {
         }, this.saveMetaList);
       }
     })
-    .catch(err => console.log(err));
+      .catch(err => console.log(err));
   };
 
   itemsToList = (items) => {
@@ -132,12 +132,42 @@ export default class SelectListsView extends React.Component {
 
   }
 
+  addNewList = () => {
+    this.setState(previousState => {
+      oldLinks = previousState.metaList.links;
+      let newList = {
+        id: new Date().getTime(),
+        label: 'New list',
+        showDone: true,
+      }
+      oldLinks.push(newList);
+      return {
+        metaList: {
+          links: oldLinks,
+          active: newList.id
+        }
+      };
+    }, () => {
+      this.saveMetaList();
+      let links = this.state.metaList.links;
+      this._handlePressListLink(links[links.length - 1])();
+    });
+  };
+
   render() {
     return (
       <View style={styles.container}>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end'}}>
-          <View style={{paddingRight: 10}}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Touchable
+            background={Touchable.Ripple('#66ff40', false)}
+            onPress={this.addNewList}>
+            <View style={[styles.optionIconContainer, {paddingLeft: 15}]}>
+                <Ionicons name="ios-add" size={35} color={Colors.iosDefault}/>
+            </View>
+          </Touchable>  
+          
+          <View style={{ paddingHorizontal: 10 }}>
             {!this.state.edit &&
               <Button
                 onPress={() => {
@@ -145,7 +175,7 @@ export default class SelectListsView extends React.Component {
                     edit: true,
                   })
                 }}
-                title='Edit'/>
+                title='Edit' />
             }
             {this.state.edit &&
               <Button
@@ -154,113 +184,81 @@ export default class SelectListsView extends React.Component {
                     edit: false,
                   })
                 }}
-                title='Done'/>
+                title='Done' />
             }
           </View>
         </View>
+        <ScrollView
+          style={styles.container}
+          keyboardShouldPersistTaps='always'>
+          {this.state.metaList.links.map(link =>
+            <View
+              key={link.id}
+              style={link.id == this.state.metaList.active ? styles.activeOption : styles.option}>
+              <Touchable
+                background={Touchable.Ripple('#ccc', false)}
+                style={{ flex: 1, overflow: 'hidden', }}
+                onPress={this._handlePressListLink(link)}>
 
-        {this.state.metaList.links.map(link =>
-          <View
-            key={link.id}
-            style={link.id == this.state.metaList.active ? styles.activeOption : styles.option}>
-          <Touchable
-            background={Touchable.Ripple('#ccc', false)}
-            style={{flex: 1, overflow: 'hidden', }}
-            onPress={this._handlePressListLink(link)}>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 15}}>
-                <View style={styles.optionIconContainer}>
-                  <Ionicons name="ios-list" size={22} color={link.id == this.state.metaList.active ? "#000" : "#ccc"} />
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 15 }}>
+                  <View style={styles.optionIconContainer}>
+                    <Ionicons name="ios-list" size={22} color={link.id == this.state.metaList.active ? "#000" : "#ccc"} />
+                  </View>
+                  <View style={styles.optionTextContainer}>
+                    <Text style={styles.optionText}>
+                      {link.label}
+                    </Text>
+                  </View>
                 </View>
-                <View style={styles.optionTextContainer}>
-                  <Text style={styles.optionText}>
-                    {link.label}
-                  </Text>
-                </View>
-              </View>
-            </Touchable>
+              </Touchable>
               {this.state.edit &&
-                <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                <View style={styles.optionIconContainer}>
-                  <ActionIcon
-                    icon='ios-paper-plane'
-                    color='#1284f7'
-                    click={ async () => {
-                    const listContent = await this.getListContent(link.id);
-                    Share.share(
-                      {
-                        title: `Share a list ${link.label} with friend`,
-                        message: await this.getListContent(link.id),
-                        url: 'https://github.com/jaros/check-list',
-                      }
-                    );
-                  }}
-                  />
-              </View>
-              <View style={styles.optionIconContainer}>
-                  <ActionIcon
-                    icon='ios-create'
-                    click={() => this.toggleShowRenameList(link.id)}
-                    color='#1284f7'
-                  />
+                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                  <View style={styles.optionIconContainer}>
+                    <ActionIcon
+                      icon='ios-paper-plane'
+                      color='#1284f7'
+                      click={async () => {
+                        const listContent = await this.getListContent(link.id);
+                        Share.share(
+                          {
+                            title: `Share a list ${link.label} with friend`,
+                            message: await this.getListContent(link.id),
+                            url: 'https://github.com/jaros/check-list',
+                          }
+                        );
+                      }}
+                    />
+                  </View>
+                  <View style={styles.optionIconContainer}>
+                    <ActionIcon
+                      icon='ios-create'
+                      click={() => this.toggleShowRenameList(link.id)}
+                      color='#1284f7'
+                    />
+                  </View>
+                  <View style={styles.optionIconContainer}>
+                    <ActionIcon
+                      icon='ios-remove-circle'
+                      click={() => {
+                        console.log('delete a list', link.id);
+                        this.deleteList(link.id);
+                      }}
+                      color='#ff3b30' />
+                  </View>
                 </View>
-                <View style={styles.optionIconContainer}>
-                  <ActionIcon
-                    icon='ios-remove-circle'
-                    click={() => {
-                    console.log('delete a list', link.id);
-                    this.deleteList(link.id);
-                  }}
-                  color='#ff3b30'/>
-                </View>
-              </View>
               }
-          </View>
-        )}
-        <Touchable
-          background={Touchable.Ripple('#66ff40', false)}
-          style={styles.option}
-          onPress={() => {
-            this.setState(previousState => {
-              oldLinks = previousState.metaList.links;
-              let newList = {
-                id: new Date().getTime(),
-                label: 'New list',
-                showDone: true,
-              }
-              oldLinks.push(newList);
-              return {
-                metaList: {
-                  links: oldLinks,
-                  active: newList.id
-                }
-              };
-            }, () => {
-              this.saveMetaList();
-              let links = this.state.metaList.links;
-              this._handlePressListLink(links[links.length - 1])();
-            });
-          }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
-            <View style={styles.optionIconContainer}>
-              <Ionicons name="ios-add-circle-outline" size={22} color={"#ccc"} />
             </View>
-            <View style={styles.optionTextContainer}>
-              <Text style={styles.optionText}>
-                Add new list
-              </Text>
-            </View>
-          </View>
-        </Touchable>
-
-        {this.state.editableList &&
-          <RenameList
-            onUpdate={this.onListNameUpdate}
-            initValue={this.editableListName}
-            show={this.state.showRenameList}
-            toggleShow={this.toggleShowRenameList}
+          )}
+          
+          {this.state.editableList &&
+            <RenameList
+              onUpdate={this.onListNameUpdate}
+              initValue={this.editableListName}
+              show={this.state.showRenameList}
+              toggleShow={this.toggleShowRenameList}
             />
-        }
+          }
+        </ScrollView>
       </View>
     );
   }
@@ -286,6 +284,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 15,
     paddingBottom: 60,
+    backgroundColor: '#fff',
   },
   optionsActive: {
     backgroundColor: Colors.logoLightColor,

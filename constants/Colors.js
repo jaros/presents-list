@@ -1,6 +1,7 @@
 const tintColor = '#7cbe81';
 
 export default {
+  iosDefault: '#007aff',
   tintColor,
   tabIconDefault: '#ccc',
   tabIconSelected: tintColor,
