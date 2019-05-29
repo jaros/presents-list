@@ -22,6 +22,8 @@ export default class ActiveListScreen extends React.Component {
     header: null,
   };
 
+  isDeleting = false; // todo workaround to handle async actions from swipeable component
+
   constructor(props) {
     super(props);
     this.state = {
@@ -29,6 +31,8 @@ export default class ActiveListScreen extends React.Component {
       metaList: {},
       currentList: {},
       isEdit: false,
+      isSwiping: false,
+      currentlyOpenSwipeable: null,
     };
 
     this.loadMetaList();
@@ -43,7 +47,7 @@ export default class ActiveListScreen extends React.Component {
     this.props.navigation.addListener(
       'willBlur',
       () => {
-        this.setState({isEdit: false});
+        this.setState({ isEdit: false });
         console.log('has left active list')
       }
     );
@@ -67,7 +71,7 @@ export default class ActiveListScreen extends React.Component {
       console.log('adjust list order')
       list = list.map((item, idx) => ({
         ...item,
-        order: (idx+1) * 100
+        order: (idx + 1) * 100
       }));
       this.storeItems(list);
     }
@@ -122,11 +126,21 @@ export default class ActiveListScreen extends React.Component {
 
   deleteItem = (key) => {
     // console.log('deleteting item...', key)
+    if (!this.state.items.some(item => item.key === key)) {
+      return; // already deleted
+    }
+    console.log('deleting item')
+    this.isDeleting = true;
     this.setState(previousState => {
       return {
-        items: previousState.items.filter(item => item.key !== key)
+        items: previousState.items.filter(item => item.key !== key),
+        currentlyOpenSwipeable: null,
       }
-    }, this.storeItems);
+    }, () => {
+      console.log("the item was removed")
+      this.isDeleting = false;
+      this.storeItems();
+    });
   };
 
   updateItem = (key, apply) => {
@@ -156,7 +170,7 @@ export default class ActiveListScreen extends React.Component {
         items: previousState.items.concat([{
           key: new Date().getTime(),
           text: newValue,
-          order: (previousState.items.length+1) * 100,
+          order: (previousState.items.length + 1) * 100,
         }])
       }
     }, () => this.storeItems().then(() => this.scrollView.scrollToEnd()));
@@ -177,7 +191,39 @@ export default class ActiveListScreen extends React.Component {
     }, this.saveMetaList);
   };
 
+  // handleScroll = () => {
+  //   const { currentlyOpenSwipeable } = this.state;
+
+  //   if (currentlyOpenSwipeable) {
+  //     currentlyOpenSwipeable.recenter();
+  //   }
+  // };
+
+  onSwipeStart = () => this.setState({isSwiping: true});
+  onSwipeRelease = () => this.setState({isSwiping: false});
+
   showActiveTodos = () => {
+    const itemProps = {
+      onOpen: (event, gestureState, swipeable) => {
+        const {currentlyOpenSwipeable} = this.state;
+        console.log("on open ", currentlyOpenSwipeable == null)
+        if (currentlyOpenSwipeable && currentlyOpenSwipeable !== swipeable && !this.isDeleting) {
+          currentlyOpenSwipeable.recenter();
+        }
+
+        if (swipeable) {
+          this.setState({ currentlyOpenSwipeable: swipeable });
+        }
+      },
+      onClose: () => {
+        this.setState({ currentlyOpenSwipeable: null });
+        // console.log("on close ")
+      },
+      onDone: this.toggleItem,
+      onDelete: this.deleteItem,
+      onSwipeStart: this.onSwipeStart,
+      onSwipeRelease: this.onSwipeRelease,
+    };
     return <ScrollView
       showsVerticalScrollIndicator={false}
       scrollEventThrottle={16}
@@ -186,6 +232,8 @@ export default class ActiveListScreen extends React.Component {
       keyboardDismissMode='on-drag'
       keyboardShouldPersistTaps='always'
       ref={(ref) => { this.scrollView = ref; }}
+      // onScroll={this.handleScroll}
+      scrollEnabled={!this.state.isSwiping}
     >
 
       <View style={styles.listContainer}>
@@ -193,14 +241,14 @@ export default class ActiveListScreen extends React.Component {
         {
           this.state.items
             .filter(item => !item.done || this.state.currentList.showDone)
-            .sort(function(obj1, obj2) {
+            .sort(function (obj1, obj2) {
               // Ascending
               return obj1.order - obj2.order;
             })
             .map(item =>
               <TodoItem key={item.key}
                 item={item}
-                onDone={this.toggleItem}
+                {...itemProps}
               />
             )
         }
@@ -222,11 +270,11 @@ export default class ActiveListScreen extends React.Component {
     let onPositonChange = (key, currentOrder) => {
       let item = items[key];
       let newIdx = currentOrder.indexOf(key);
-      let prevItemIdx = newIdx > 0 ? currentOrder[newIdx-1] : -1;
-      let nextItemIdx = newIdx < (currentOrder.length -1) ? currentOrder[newIdx+1] : -1;
-      
+      let prevItemIdx = newIdx > 0 ? currentOrder[newIdx - 1] : -1;
+      let nextItemIdx = newIdx < (currentOrder.length - 1) ? currentOrder[newIdx + 1] : -1;
+
       let prevOrder = prevItemIdx !== -1 ? items[prevItemIdx].order : 0;
-      let nextOrder = nextItemIdx !== -1 ? items[nextItemIdx].order : (currentOrder.length+1) * 100;
+      let nextOrder = nextItemIdx !== -1 ? items[nextItemIdx].order : (currentOrder.length + 1) * 100;
 
       let newItemOrder = (prevOrder + nextOrder) / 2;
       item.order = newItemOrder;
@@ -277,6 +325,8 @@ export default class ActiveListScreen extends React.Component {
               Keyboard.dismiss()
               if (this.state.isEdit) {
                 this.state.items.sort((obj1, obj2) => obj1.order - obj2.order).forEach(it => console.log(it))
+              } else {
+                this.setState({ currentlyOpenSwipeable: null });
               }
               this.setState((state, props) => ({ isEdit: !state.isEdit }));
             }}
@@ -323,8 +373,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   listContainer: {
-    paddingLeft: 15,
-    paddingRight: 15,
+    // paddingLeft: 15,
+    // paddingRight: 15,
     paddingBottom: 10,
   },
 
