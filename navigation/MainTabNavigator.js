@@ -48,29 +48,29 @@ ListsStack.navigationOptions = {
   ),
 };
 
-const AboutStack = createStackNavigator({
-  About: AboutScreen,
-});
+// const AboutStack = createStackNavigator({
+//   About: AboutScreen,
+// });
 
-AboutStack.navigationOptions = {
-  tabBarLabel: 'About',
-  tabBarOnPress: hideKeyboard('AboutStack'),
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? `ios-information-circle${focused ? '' : '-outline'}` : 'md-information-circle'}
-    />
-  ),
-};
+// AboutStack.navigationOptions = {
+//   tabBarLabel: 'About',
+//   tabBarOnPress: hideKeyboard('AboutStack'),
+//   tabBarIcon: ({ focused }) => (
+//     <TabBarIcon
+//       focused={focused}
+//       name={Platform.OS === 'ios' ? `ios-information-circle${focused ? '' : '-outline'}` : 'md-information-circle'}
+//     />
+//   ),
+// };
 
 export default createMaterialTopTabNavigator({
   ActiveListStack,
   ListsStack,
-  AboutStack,
+  // AboutStack,
 }, {
     // initialRouteName: 'ActiveListStack',
     // tabBarPosition: 'bottom',
-    swipeEnabled: true,
+    swipeEnabled: false,
     animationEnabled: true,
     lazy: false,
     tabBarOptions: {
