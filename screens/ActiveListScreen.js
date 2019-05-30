@@ -16,6 +16,7 @@ import { Header } from 'react-navigation';
 import { todoItemsMetaList } from '../components/SelectListsView';
 import TodoItemEdit from '../components/TodoItemEdit';
 import SortableList from 'react-native-sortable-list';
+import {ANIMATION_DURATION} from '../constants/Layout';
 
 export default class ActiveListScreen extends React.Component {
   static navigationOptions = {
@@ -172,7 +173,9 @@ export default class ActiveListScreen extends React.Component {
           order: (previousState.items.length + 1) * 100,
         }])
       }
-    }, () => this.storeItems().then(() => this.scrollView.scrollToEnd()));
+    }, () => this.storeItems().then(() => 
+     setTimeout(this.scrollView.scrollToEnd, ANIMATION_DURATION)
+    ));
   };
 
 
@@ -284,6 +287,7 @@ export default class ActiveListScreen extends React.Component {
 
   render() {
     return (
+      
       <KeyboardAvoidingView
         style={styles.container}
         behavior="padding"
@@ -324,24 +328,26 @@ export default class ActiveListScreen extends React.Component {
           />
         </View>
 
-        {!this.state.isEdit &&
-          this.showActiveTodos()
-        }
-        {this.state.isEdit &&
-          this.showEditTodos()
-        }
+        
+          {!this.state.isEdit &&
+            this.showActiveTodos()
+          }
+          {this.state.isEdit &&
+            this.showEditTodos()
+          }
 
-        {this.state.isEdit === false &&
-          <View style={[styles.header]}>
-            <TextEdit
-              onSave={this.addItem}
-              onFocus={() => { setTimeout(this.scrollView.scrollToEnd, 100); console.log('scroll to the end'); }}
-              initValue=''
-              saveLabel='Add note'
-              textInputPlaceholder='Type here to add item!'
-            />
-          </View>
-        }
+          {this.state.isEdit === false &&
+            <View style={[styles.header]}>
+              <TextEdit
+                onSave={this.addItem}
+                onFocus={() => { setTimeout(this.scrollView.scrollToEnd, 100); console.log('scroll to the end'); }}
+                initValue=''
+                saveLabel='Add note'
+                textInputPlaceholder='Type here to add item!'
+              />
+            </View>
+          }
+        
       </KeyboardAvoidingView>
     );
   }

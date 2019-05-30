@@ -1,9 +1,10 @@
 import React from 'react';
-import { Text, View, TouchableHighlight, Platform, StyleSheet } from 'react-native';
+import { Animated, Text, View, TouchableHighlight, Platform, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-swipeable';
 import Colors from '../constants/Colors';
 import { Haptic } from 'expo';
+import { ANIMATION_DURATION } from '../constants/Layout';
 
 export class ActionIcon extends React.Component {
   render() {
@@ -29,9 +30,18 @@ export default class TodoItem extends React.Component {
       done: this.props.item.done,
       rightActionActivated: false,
     };
+    this._animated = new Animated.Value(0);
+  }
+
+  componentDidMount() {
+    Animated.timing(this._animated, {
+      toValue: 1,
+      duration: ANIMATION_DURATION,
+    }).start();
   }
 
   toggleDone = () => {
+    Haptic.selection();
     this.setState(previousState => {
       return { done: !previousState.done }
     }, () => {
@@ -43,7 +53,12 @@ export default class TodoItem extends React.Component {
     return this.state.done ? [styles.item, styles.done] : [styles.item, styles.itemColor];
   }
 
-  doRemove = () => this.props.onDelete(this.props.item.key)
+  doRemove = () => {
+    Animated.timing(this._animated, {
+      toValue: 0,
+      duration: ANIMATION_DURATION,
+    }).start(() => this.props.onDelete(this.props.item.key));
+  }
 
   render() {
     const deleteActivated = this.state.rightActionActivated;
@@ -54,11 +69,36 @@ export default class TodoItem extends React.Component {
       >
         {/* <Text style={{ color: 'white' }}>Delete</Text> */}
         <Ionicons
-            name="ios-trash"
-            size={deleteActivated ? 32 : 22}
-            color="white" />
-        </TouchableHighlight>
-    ]
+          name="ios-trash"
+          size={deleteActivated ? 32 : 22}
+          color="white" />
+      </TouchableHighlight>
+    ];
+
+    const rowStyles = [
+      styles.row,
+      { opacity: this._animated },
+      {
+        transform: [
+          { scale: this._animated },
+          {
+            rotate: this._animated.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['35deg', '0deg'],
+              extrapolate: 'clamp',
+            })
+          }
+        ],
+      },
+      {
+        // NEW CODE
+        height: this._animated.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 88],
+          extrapolate: 'clamp',
+        }),
+      },
+    ];
 
     return (
       <Swipeable
@@ -81,10 +121,8 @@ export default class TodoItem extends React.Component {
         onSwipeStart={this.props.onSwipeStart}
         onSwipeRelease={this.props.onSwipeRelease}
       >
-        <View
-          style={[
-            styles.row,
-          ]}
+        <Animated.View
+          style={rowStyles}
         >
           {
             this.state.done && <ActionIcon icon='ios-checkbox-outline' size={24} click={this.toggleDone} />
@@ -100,7 +138,7 @@ export default class TodoItem extends React.Component {
           }}>
             <Text style={this.textStyle()}>{this.props.item.text}</Text>
           </View>
-        </View>
+        </Animated.View>
       </Swipeable>
     )
   }
