@@ -38,7 +38,7 @@ export default class TextEdit extends React.Component {
              value={this.state.text}
              clearButtonMode='while-editing'
              selectTextOnFocus={false}
-             autoFocus={true}
+             autoFocus={false}
              onFocus={() => {
                if (this.props.onFocus) this.props.onFocus()
              }
