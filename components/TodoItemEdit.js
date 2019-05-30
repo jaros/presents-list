@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import Colors from '../constants/Colors';
 import { ActionIcon } from './TodoItem';
+import { Ionicons } from '@expo/vector-icons';
 import RenameList from './RenameList';
 
 export default class TodoItemEdit extends React.Component {
@@ -71,7 +72,7 @@ export default class TodoItemEdit extends React.Component {
   };
 
   textStyle() {
-    return this.props.data.done ? [styles.done] : [styles.itemColor];
+    return this.props.data.done ? [styles.item, styles.done] : [styles.item, styles.itemColor];
   }
 
   render() {
@@ -82,23 +83,30 @@ export default class TodoItemEdit extends React.Component {
         styles.row,
         this._style,
       ]}>
-        <Text style={this.textStyle()}>{data.text}</Text>
+        <View style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+          <Ionicons name="ios-reorder" size={22} color='#383636' />
+        </View>
 
-        <View style={{
-          flexDirection: 'row',
-        }}>
-        <ActionIcon icon='ios-remove-circle' click={() => {
-          console.log('delete a note', data.key);
-          this.props.onDelete(data.key);
-        }}
-          size={24}
-          color='#ff3b30' />
+        <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+          <View style={{ maxWidth: 200 }}>
+            <Text style={[this.textStyle()]}>{data.text}</Text>
+          </View>
+          <View style={{
+            flexDirection: 'row', alignItems: 'center'
+          }}>
+            <ActionIcon icon='ios-remove-circle' click={() => {
+              console.log('delete a note', data.key);
+              this.props.onDelete(data.key);
+            }}
+              size={24}
+              color='#ff3b30' />
 
-        <ActionIcon
-          icon='ios-create'
-          click={() => this.toggleShowRenameList()}
-          color='#1284f7'
-        />
+            <ActionIcon
+              icon='ios-create'
+              click={() => this.toggleShowRenameList()}
+              color='#1284f7'
+            />
+          </View>
         </View>
 
         <RenameList
@@ -141,18 +149,26 @@ const styles = StyleSheet.create({
     color: '#383636'
   },
 
+  item: {
+    padding: 10,
+    fontSize: 18,
+    minHeight: 44,
+    flexGrow: 1,
+    flexWrap: 'wrap',
+  },
+
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#fff',
     padding: 12,
-    height: 44,
+    //height: 44,
     flex: 1,
-    marginTop: 7,
-    marginBottom: 12,
+    //marginTop: 7,
+    //marginBottom: 12,
     borderRadius: 4,
-
+    backgroundColor: Colors.tabBar,
 
     ...Platform.select({
       ios: {

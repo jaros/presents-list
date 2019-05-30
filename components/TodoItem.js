@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text, View, Dimensions, TouchableHighlight, StyleSheet } from 'react-native';
+import { Text, View, TouchableHighlight, Platform, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-swipeable';
+import Colors from '../constants/Colors';
 
 export class ActionIcon extends React.Component {
   render() {
@@ -13,7 +14,7 @@ export class ActionIcon extends React.Component {
           <Ionicons
             name={this.props.icon}
             size={this.props.size || 28}
-            color={this.props.color || styles.itemColor} />
+            color={this.props.color || "black"} />
         </View>
       </TouchableHighlight>
     )
@@ -50,10 +51,8 @@ export default class TodoItem extends React.Component {
         onPress={this.doRemove}
         style={{ backgroundColor: deleteActivated ? '#8b0000' : '#ff3b30', flex: 1, justifyContent: "center", paddingHorizontal: 20 }}
       >
-        <Text style={{ color: 'white' }}>Delte</Text></TouchableHighlight>
+        <Text style={{ color: 'white' }}>Delete</Text></TouchableHighlight>
     ]
-
-    const screenWidth = Math.round(Dimensions.get('window').width);
 
     return (
       <Swipeable
@@ -64,17 +63,21 @@ export default class TodoItem extends React.Component {
         swipeStartMinRightEdgeClearance={10}
         rigthButtonWidth={80}
         rightActionActivationDistance={175}
-        onRightActionActivate={() => this.setState({rightActionActivated: true})}
+        onRightActionActivate={() => this.setState({ rightActionActivated: true })}
         onRightActionDeactivate={() => {
-          this.setState({rightActionActivated: false});
+          this.setState({ rightActionActivated: false });
         }}
         onRightActionRelease={this.doRemove}
         onSwipeStart={this.props.onSwipeStart}
         onSwipeRelease={this.props.onSwipeRelease}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View
+          style={[
+            styles.row,
+          ]}
+        >
           {
-            this.state.done && <ActionIcon icon='ios-checkbox-outline' size={24} click={this.toggleDone} color='#d9d9d9' />
+            this.state.done && <ActionIcon icon='ios-checkbox-outline' size={24} click={this.toggleDone} />
           }
           {
             !this.state.done && <ActionIcon icon='ios-square-outline' size={24} click={this.toggleDone} />
@@ -82,7 +85,6 @@ export default class TodoItem extends React.Component {
 
           <View style={{
             flexDirection: 'row',
-            //height: 60,
             width: 60,
             flexGrow: 1,
           }}>
@@ -109,5 +111,34 @@ const styles = StyleSheet.create({
   },
   itemColor: {
     color: '#383636'
-  }
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    padding: 12,
+    //height: 44,
+    flex: 1,
+    //marginTop: 7,
+    //marginBottom: 12,
+    borderRadius: 4,
+    backgroundColor: Colors.tabBar,
+
+    ...Platform.select({
+      ios: {
+        width: window.width - 30 * 2,
+        shadowColor: 'rgba(0,0,0,0.2)',
+        shadowOpacity: 1,
+        shadowOffset: { height: 2, width: 2 },
+        shadowRadius: 2,
+      },
+
+      android: {
+        width: window.width - 30 * 2,
+        elevation: 0,
+        marginHorizontal: 30,
+      },
+    })
+  },
 });
