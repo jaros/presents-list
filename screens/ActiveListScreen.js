@@ -125,7 +125,6 @@ export default class ActiveListScreen extends React.Component {
   };
 
   deleteItem = (key) => {
-    // console.log('deleteting item...', key)
     if (!this.state.items.some(item => item.key === key)) {
       return; // already deleted
     }
@@ -191,21 +190,13 @@ export default class ActiveListScreen extends React.Component {
     }, this.saveMetaList);
   };
 
-  // handleScroll = () => {
-  //   const { currentlyOpenSwipeable } = this.state;
-
-  //   if (currentlyOpenSwipeable) {
-  //     currentlyOpenSwipeable.recenter();
-  //   }
-  // };
-
-  onSwipeStart = () => this.setState({isSwiping: true});
-  onSwipeRelease = () => this.setState({isSwiping: false});
+  onSwipeStart = () => this.setState({ isSwiping: true });
+  onSwipeRelease = () => this.setState({ isSwiping: false });
 
   showActiveTodos = () => {
     const itemProps = {
       onOpen: (event, gestureState, swipeable) => {
-        const {currentlyOpenSwipeable} = this.state;
+        const { currentlyOpenSwipeable } = this.state;
         console.log("on open ", currentlyOpenSwipeable == null)
         if (currentlyOpenSwipeable && currentlyOpenSwipeable !== swipeable && !this.isDeleting) {
           currentlyOpenSwipeable.recenter();
@@ -217,7 +208,6 @@ export default class ActiveListScreen extends React.Component {
       },
       onClose: () => {
         this.setState({ currentlyOpenSwipeable: null });
-        // console.log("on close ")
       },
       onDone: this.toggleItem,
       onDelete: this.deleteItem,
@@ -228,11 +218,10 @@ export default class ActiveListScreen extends React.Component {
       showsVerticalScrollIndicator={false}
       scrollEventThrottle={16}
       style={styles.container}
-      contentContainerStyle={styles.contentContainer}
+      contentContainerStyle={styles.listContainer}
       keyboardDismissMode='on-drag'
       keyboardShouldPersistTaps='always'
       ref={(ref) => { this.scrollView = ref; }}
-      // onScroll={this.handleScroll}
       scrollEnabled={!this.state.isSwiping}
     >
 
@@ -362,9 +351,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  contentContainer: {
-    paddingTop: 30,
+    //backgroundColor: '#efecec',
   },
   header: {
     backgroundColor: Colors.tabBar,
