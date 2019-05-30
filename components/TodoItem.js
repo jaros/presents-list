@@ -3,6 +3,7 @@ import { Text, View, TouchableHighlight, Platform, StyleSheet } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-swipeable';
 import Colors from '../constants/Colors';
+import { Haptic } from 'expo';
 
 export class ActionIcon extends React.Component {
   render() {
@@ -49,9 +50,14 @@ export default class TodoItem extends React.Component {
     const rightContent = [
       <TouchableHighlight
         onPress={this.doRemove}
-        style={{ backgroundColor: deleteActivated ? '#8b0000' : '#ff3b30', flex: 1, justifyContent: "center", paddingHorizontal: 20 }}
+        style={{ backgroundColor: '#ff3b30', flex: 1, justifyContent: "center", paddingHorizontal: 35 }}
       >
-        <Text style={{ color: 'white' }}>Delete</Text></TouchableHighlight>
+        {/* <Text style={{ color: 'white' }}>Delete</Text> */}
+        <Ionicons
+            name="ios-trash"
+            size={deleteActivated ? 32 : 22}
+            color="white" />
+        </TouchableHighlight>
     ]
 
     return (
@@ -61,9 +67,13 @@ export default class TodoItem extends React.Component {
         onRightButtonsCloseRelease={this.props.onClose}
         swipeStartMinLeftEdgeClearance={10}
         swipeStartMinRightEdgeClearance={10}
-        rigthButtonWidth={80}
-        rightActionActivationDistance={175}
-        onRightActionActivate={() => this.setState({ rightActionActivated: true })}
+        rightButtonWidth={80}
+        rightActionActivationDistance={125}
+        onRightActionActivate={() => {
+          this.setState({ rightActionActivated: true });
+          Haptic.impact('medium');
+        }
+        }
         onRightActionDeactivate={() => {
           this.setState({ rightActionActivated: false });
         }}

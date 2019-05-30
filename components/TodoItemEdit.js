@@ -94,7 +94,7 @@ export default class TodoItemEdit extends React.Component {
           <View style={{
             flexDirection: 'row', alignItems: 'center'
           }}>
-            <ActionIcon icon='ios-remove-circle' click={() => {
+            <ActionIcon icon='ios-trash' click={() => {
               console.log('delete a note', data.key);
               this.props.onDelete(data.key);
             }}

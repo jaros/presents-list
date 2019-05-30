@@ -244,7 +244,7 @@ export default class SelectListsView extends React.Component {
                   </View>
                   <View style={styles.optionIconContainer}>
                     <ActionIcon
-                      icon='ios-remove-circle'
+                      icon='ios-trash'
                       click={() => {
                         console.log('delete a list', link.id);
                         this.deleteList(link.id);
