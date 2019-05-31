@@ -1,7 +1,6 @@
 import React from 'react';
-import { Animated, Alert, AsyncStorage, Button, StyleSheet, Text, View, Platform, Share, ScrollView } from 'react-native';
+import { Animated, Alert, AsyncStorage, Button, StyleSheet, Text, View, Platform, TouchableOpacity, Share, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Touchable from 'react-native-platform-touchable';
 import Colors from '../constants/Colors';
 import { ANIMATION_DURATION } from '../constants/Layout';
 import { ActionIcon } from './TodoItem';
@@ -151,13 +150,13 @@ export default class SelectListsView extends React.Component {
       <View style={styles.container}>
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Touchable
-            background={Touchable.Ripple('#66ff40', false)}
+          <TouchableOpacity
+            background={'#66ff40'}
             onPress={this.addNewList}>
             <View style={[styles.optionIconContainer, { paddingLeft: 15 }]}>
               <Ionicons name="ios-add" size={35} color={Colors.iosDefault} />
             </View>
-          </Touchable>
+          </TouchableOpacity>
 
           <View style={{ paddingHorizontal: 10 }}>
             {!this.state.edit &&
@@ -280,8 +279,8 @@ class ListItem extends React.Component {
       <Animated.View
         key={link.id}
         style={rowStyles}>
-        <Touchable
-          background={Touchable.Ripple('#ccc', false)}
+        <TouchableOpacity
+          background={'#ccc'}
           style={{ flex: 1, overflow: 'hidden', }}
           onPress={onPressLink(link)}>
 
@@ -295,7 +294,7 @@ class ListItem extends React.Component {
               </Text>
             </View>
           </View>
-        </Touchable>
+        </TouchableOpacity>
         {isEdit &&
           <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
             <View style={styles.optionIconContainer}>

@@ -24,6 +24,7 @@ export default class TextEdit extends React.Component {
   };
 
   render() {
+    const {onFocus, textInputPlaceholder, autoFocus} = this.props;
     return (
       <View style={styles.textInputContainer}>
         <View style={{
@@ -38,7 +39,7 @@ export default class TextEdit extends React.Component {
              value={this.state.text}
              clearButtonMode='while-editing'
              selectTextOnFocus={false}
-             autoFocus={false}
+             autoFocus={!!autoFocus}
              onFocus={() => {
                if (this.props.onFocus) this.props.onFocus()
              }
