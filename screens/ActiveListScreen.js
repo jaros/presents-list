@@ -255,7 +255,7 @@ export default class ActiveListScreen extends React.Component {
       this.setState({ currentlyOpenSwipeable: null });
     }
     const newEditState = !this.state.isEdit
-    this.setState((state, props) => ({ isEdit: newEditState }));
+    this.setState({ isEdit: newEditState });
     this.props.navigation.setParams({ headerRightBtnLabel: newEditState ? "Done" : "Edit" });
   }
 

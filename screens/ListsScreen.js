@@ -18,14 +18,33 @@ export const todoItemsMetaList = {
 };
 
 export default class ListsScreen extends React.Component {
-  static navigationOptions = {
-    // header: null,
-    title: 'Lists',
-    headerTitleStyle: {
-      fontSize: 22,
-      fontWeight: '500',
-      color: Colors.tintColor
-    },
+  static navigationOptions = ({ navigation }) => {
+    return {
+      // header: null,
+      title: 'Lists',
+      headerTitleStyle: {
+        fontSize: 22,
+        fontWeight: '500',
+        color: Colors.tintColor
+      },
+      headerLeft: (
+        <TouchableOpacity
+            background={'#66ff40'}
+            onPress={() => navigation.getParam('addNewList')()}>
+            <View style={[styles.optionIconContainer, { paddingLeft: 15 }]}>
+              <Ionicons name="ios-add" size={35} color={Colors.iosDefault} />
+            </View>
+          </TouchableOpacity>
+      ),
+      headerRight: (
+        <View style={{ paddingRight: 10 }}>
+          <Button
+            onPress={() => navigation.getParam('toggleEditAction')()}
+            title={"" + navigation.getParam('headerRightBtnLabel', '')}
+          />
+        </View>
+      ),
+    }
   };
 
   constructor(props) {
@@ -38,6 +57,14 @@ export default class ListsScreen extends React.Component {
     };
 
     this.loadMetaList();
+  }
+
+  componentDidMount() {
+    this.props.navigation.setParams({
+      toggleEditAction: this.toggleEditButton,
+      addNewList: this.addNewList,
+      headerRightBtnLabel: "Edit",
+    });
   }
 
   activeList = () => {
@@ -167,40 +194,15 @@ export default class ListsScreen extends React.Component {
     });
   };
 
+  toggleEditButton = () => {
+    const isEdit = !this.state.edit
+    this.setState({ edit: isEdit });
+    this.props.navigation.setParams({ headerRightBtnLabel: isEdit ? "Done" : "Edit" });
+  }
+
   render() {
     return (
       <View style={styles.container}>
-
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <TouchableOpacity
-            background={'#66ff40'}
-            onPress={this.addNewList}>
-            <View style={[styles.optionIconContainer, { paddingLeft: 15 }]}>
-              <Ionicons name="ios-add" size={35} color={Colors.iosDefault} />
-            </View>
-          </TouchableOpacity>
-
-          <View style={{ paddingHorizontal: 10 }}>
-            {!this.state.edit &&
-              <Button
-                onPress={() => {
-                  this.setState({
-                    edit: true,
-                  })
-                }}
-                title='Edit' />
-            }
-            {this.state.edit &&
-              <Button
-                onPress={() => {
-                  this.setState({
-                    edit: false,
-                  })
-                }}
-                title='Done' />
-            }
-          </View>
-        </View>
         <ScrollView
           style={styles.container}
           keyboardShouldPersistTaps='always'>
@@ -361,8 +363,6 @@ class ListItem extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 15,
-    paddingBottom: 60,
     backgroundColor: '#fff',
   },
   optionsActive: {
