@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, Text, View, TouchableHighlight, Platform, StyleSheet } from 'react-native';
+import { Animated, Text, View, TouchableHighlight, TouchableOpacity, Platform, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-swipeable';
 import Colors from '../constants/Colors';
@@ -41,7 +41,7 @@ export default class TodoItem extends React.Component {
   }
 
   toggleDone = () => {
-    Haptic.selection();
+    Haptic.impact('light');
     this.setState(previousState => {
       return { done: !previousState.done }
     }, () => {
@@ -136,7 +136,11 @@ export default class TodoItem extends React.Component {
             width: 60,
             flexGrow: 1,
           }}>
-            <Text style={this.textStyle()}>{this.props.item.text}</Text>
+            <TouchableOpacity
+              onPress={this.toggleDone}
+            >
+              <Text style={this.textStyle()}>{this.props.item.text}</Text>
+            </TouchableOpacity>
           </View>
         </Animated.View>
       </Swipeable>
