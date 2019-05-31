@@ -51,14 +51,6 @@ export default class ActiveListScreen extends React.Component {
         this.loadMetaList();
       }
     );
-
-    this.props.navigation.addListener(
-      'willBlur',
-      () => {
-        this.setState({ isEdit: false });
-        console.log('has left active list')
-      }
-    );
   }
 
   listKey = () => {
@@ -299,7 +291,6 @@ export default class ActiveListScreen extends React.Component {
         style={styles.container}
         behavior="padding"
         enabled
-        keyboardVerticalOffset={Header.HEIGHT + 35}
       >
 
         <View
