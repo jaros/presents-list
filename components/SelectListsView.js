@@ -11,7 +11,7 @@ export const todoItemsMetaList = {
   links: [
     {
       id: 1,
-      label: 'My list',
+      label: 'My list ONE',
       showDone: true,
     }
   ]
@@ -65,15 +65,17 @@ export default class SelectListsView extends React.Component {
   loadMetaList = async () => {
     try {
       const value = await AsyncStorage.getItem('TODO_ITEMS_META_LIST');
+      console.log('raw value', value)
       if (value) {
-        this.setState({
-          metaList: JSON.parse(value)
-        });
-      }
-      else { // init first time
-        this.setState({
-          metaList: todoItemsMetaList
-        }, this.saveMetaList);
+        const metaList = JSON.parse(value);
+        console.log('metalist', value)
+        if (metaList.links.length === 0) {
+          this.initFirstTime();
+        } else {
+          this.setState({ metaList });
+        }
+      } else { // init first time
+        this.initFirstTime();
       }
     }
     catch (err) {
@@ -81,11 +83,18 @@ export default class SelectListsView extends React.Component {
     }
   };
 
+  initFirstTime = () => this.setState({
+    metaList: todoItemsMetaList
+  }, this.saveMetaList);
+
   itemsToList = (items) => {
-    const labels = JSON.parse(items).map(item => item.text);
-    let result = '';
-    labels.forEach(label => result += (`- ${label}\n`));
-    return result;
+    if (items) {
+      const labels = JSON.parse(items).map(item => item.text);
+      let result = '';
+      labels.forEach(label => result += (`- ${label}\n`));
+      return result;
+    }
+    return 'empty list';
   };
 
   getListContent = async (listId) => {
@@ -119,6 +128,9 @@ export default class SelectListsView extends React.Component {
     if (id == 1) { // backward compatibility, TODO remove on release
       AsyncStorage.removeItem('TODO_ITEMS');
     }
+    if (this.state.metaList.links.length === 0) {
+      this.initFirstTime()
+    }
   });
 
   addNewList = () => {
@@ -127,7 +139,7 @@ export default class SelectListsView extends React.Component {
       oldLinks = previousState.metaList.links;
       let newList = {
         id,
-        label: 'List ' + oldLinks.length,
+        label: 'List ' + (oldLinks.length + 1),
         showDone: true,
       }
       oldLinks.unshift(newList);
