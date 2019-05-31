@@ -317,7 +317,7 @@ export default class ActiveListScreen extends React.Component {
               console.log("show edit")
               Keyboard.dismiss()
               if (this.state.isEdit) {
-                this.state.items.sort((obj1, obj2) => obj1.order - obj2.order).forEach(it => console.log(it))
+                this.state.items.sort((obj1, obj2) => obj1.order - obj2.order)
               } else {
                 this.setState({ currentlyOpenSwipeable: null });
               }

@@ -67,7 +67,6 @@ export default class TodoItem extends React.Component {
         onPress={this.doRemove}
         style={{ backgroundColor: '#ff3b30', flex: 1, justifyContent: "center", paddingHorizontal: 35 }}
       >
-        {/* <Text style={{ color: 'white' }}>Delete</Text> */}
         <Ionicons
           name="ios-trash"
           size={deleteActivated ? 32 : 22}
@@ -79,22 +78,9 @@ export default class TodoItem extends React.Component {
       styles.row,
       { opacity: this._animated },
       {
-        transform: [
-          { scale: this._animated },
-          {
-            rotate: this._animated.interpolate({
-              inputRange: [0, 1],
-              outputRange: ['35deg', '0deg'],
-              extrapolate: 'clamp',
-            })
-          }
-        ],
-      },
-      {
-        // NEW CODE
         height: this._animated.interpolate({
           inputRange: [0, 1],
-          outputRange: [0, 88],
+          outputRange: [0, 68], // 68 - line height
           extrapolate: 'clamp',
         }),
       },
@@ -139,7 +125,7 @@ export default class TodoItem extends React.Component {
             <TouchableOpacity
               onPress={this.toggleDone}
             >
-              <Text style={this.textStyle()}>{this.props.item.text}</Text>
+              <Text style={this.textStyle()} numberOfLines={1}>{this.props.item.text}</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
