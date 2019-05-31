@@ -127,7 +127,7 @@ export default class SelectListsView extends React.Component {
       oldLinks = previousState.metaList.links;
       let newList = {
         id,
-        label: 'New list',
+        label: 'List ' + oldLinks.length,
         showDone: true,
       }
       oldLinks.unshift(newList);
