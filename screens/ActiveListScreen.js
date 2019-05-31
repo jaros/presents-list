@@ -24,6 +24,14 @@ export default class ActiveListScreen extends React.Component {
         fontWeight: '500',
         color: Colors.tintColor
       },
+      headerRight: (
+        <View style={{ paddingRight: 10 }}>
+          <Button
+            onPress={() => navigation.getParam('toggleEditAction')()}
+            title={"" + navigation.getParam('headerRightBtnLabel')}
+          />
+        </View>
+      ),
     };
   };
 
@@ -34,7 +42,7 @@ export default class ActiveListScreen extends React.Component {
     const listId = props.navigation.getParam('id', 'NO-ID');
     this.state = {
       items: [],
-      currentList: {showDone: true}, // mock currentList - we don't save meta property here
+      currentList: { showDone: true }, // mock currentList - we don't save meta property here
       listId: listId,
       isEdit: false,
       isSwiping: false,
@@ -43,8 +51,15 @@ export default class ActiveListScreen extends React.Component {
     this.loadStoredItems('TODO_ITEMS_' + listId);
   }
 
+  componentDidMount() {
+    this.props.navigation.setParams({
+      toggleEditAction: this.toggleEditButton,
+      headerRightBtnLabel: "Edit"
+    });
+  }
+
   listKey = () => {
-    return 'TODO_ITEMS_' + this.state.listId; 
+    return 'TODO_ITEMS_' + this.state.listId;
   };
 
   loadStoredItems = (listId) => {
@@ -83,7 +98,7 @@ export default class ActiveListScreen extends React.Component {
   toggleShowDoneItems = () => {
     this.setState(previousState => {
       let isShowDone = previousState.currentList.showDone;
-      return { currentList: {showDone: !isShowDone} };
+      return { currentList: { showDone: !isShowDone } };
     });
   };
 
@@ -232,6 +247,18 @@ export default class ActiveListScreen extends React.Component {
     return <TodoItemEdit data={data} active={active} onDelete={this.deleteItem} onChange={this.changeItemText} />
   }
 
+  toggleEditButton = () => {
+    Keyboard.dismiss()
+    if (this.state.isEdit) {
+      this.state.items.sort((obj1, obj2) => obj1.order - obj2.order)
+    } else {
+      this.setState({ currentlyOpenSwipeable: null });
+    }
+    const newEditState = !this.state.isEdit
+    this.setState((state, props) => ({ isEdit: newEditState }));
+    this.props.navigation.setParams({ headerRightBtnLabel: newEditState ? "Done" : "Edit" });
+  }
+
   render() {
     return (
       <KeyboardAvoidingView
@@ -240,7 +267,7 @@ export default class ActiveListScreen extends React.Component {
         enabled
       >
 
-        <View
+        {/* <View
           style={{
             marginHorizontal: 20,
             marginVertical: 10,
@@ -263,7 +290,7 @@ export default class ActiveListScreen extends React.Component {
             title={this.state.isEdit ? "Done" : "Edit"}
             accessibilityLabel="Edit"
           />
-        </View>
+        </View> */}
 
 
         {!this.state.isEdit &&
