@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, Text, View, TouchableHighlight, TouchableOpacity, Platform, StyleSheet } from 'react-native';
+import { LayoutAnimation, Text, View, TouchableHighlight, TouchableOpacity, Platform, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Swipeable from 'react-native-swipeable';
 import Colors from '../constants/Colors';
@@ -23,6 +23,17 @@ export class ActionIcon extends React.Component {
   }
 }
 
+const RowLayoutAnimation = {
+  duration: ANIMATION_DURATION,
+  create: {
+    type: LayoutAnimation.Types.easeInEaseOut,
+    property: LayoutAnimation.Properties.scaleY,
+  },
+  update: {
+    type: LayoutAnimation.Types.easeInEaseOut,
+  },
+};
+
 export default class TodoItem extends React.Component {
   constructor(props) {
     super(props);
@@ -30,14 +41,6 @@ export default class TodoItem extends React.Component {
       done: this.props.item.done,
       rightActionActivated: false,
     };
-    this._animated = new Animated.Value(0);
-  }
-
-  componentDidMount() {
-    Animated.timing(this._animated, {
-      toValue: 1,
-      duration: ANIMATION_DURATION,
-    }).start();
   }
 
   toggleDone = () => {
@@ -54,10 +57,8 @@ export default class TodoItem extends React.Component {
   }
 
   doRemove = () => {
-    Animated.timing(this._animated, {
-      toValue: 0,
-      duration: ANIMATION_DURATION,
-    }).start(() => this.props.onDelete(this.props.item.key));
+    LayoutAnimation.configureNext(RowLayoutAnimation);
+    this.props.onDelete(this.props.item.key)
   }
 
   render() {
@@ -72,18 +73,6 @@ export default class TodoItem extends React.Component {
           size={deleteActivated ? 32 : 22}
           color="white" />
       </TouchableHighlight>
-    ];
-
-    const rowStyles = [
-      styles.row,
-      { opacity: this._animated },
-      {
-        height: this._animated.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0, 68], // 68 - line height
-          extrapolate: 'clamp',
-        }),
-      },
     ];
 
     return (
@@ -107,8 +96,8 @@ export default class TodoItem extends React.Component {
         onSwipeStart={this.props.onSwipeStart}
         onSwipeRelease={this.props.onSwipeRelease}
       >
-        <Animated.View
-          style={rowStyles}
+        <View
+          style={styles.row}
         >
           {
             this.state.done && <ActionIcon icon='ios-checkbox-outline' size={24} click={this.toggleDone} />
@@ -125,10 +114,10 @@ export default class TodoItem extends React.Component {
             <TouchableOpacity
               onPress={this.toggleDone}
             >
-              <Text style={this.textStyle()} numberOfLines={1}>{this.props.item.text}</Text>
+              <Text style={this.textStyle()}>{this.props.item.text}</Text>
             </TouchableOpacity>
           </View>
-        </Animated.View>
+        </View>
       </Swipeable>
     )
   }
