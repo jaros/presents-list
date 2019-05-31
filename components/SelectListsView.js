@@ -281,7 +281,7 @@ export default class SelectListsView extends React.Component {
   };
 
   navigateToActive = (link) => {
-    this.props.navigation.navigate('ActiveListStack', {});
+    this.props.navigation.navigate('ActiveList', {name: link.label});
   };
 }
 

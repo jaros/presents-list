@@ -1,10 +1,17 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
+import Colors from '../constants/Colors';
 import SelectListsView from '../components/SelectListsView';
 
 export default class ListsScreen extends React.Component {
   static navigationOptions = {
-    header: null,
+    // header: null,
+    title: 'Lists',
+    headerTitleStyle: {
+      fontSize: 22,
+      fontWeight: '500',
+      color: Colors.tintColor
+    },
   };
 
   render() {

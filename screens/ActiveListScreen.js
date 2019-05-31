@@ -19,8 +19,15 @@ import SortableList from 'react-native-sortable-list';
 import {ANIMATION_DURATION} from '../constants/Layout';
 
 export default class ActiveListScreen extends React.Component {
-  static navigationOptions = {
-    header: null,
+  static navigationOptions =  ({ navigation }) => {
+    return {
+      title: navigation.getParam('name', 'Active'),
+      headerTitleStyle: {
+        fontSize: 22,
+        fontWeight: '500',
+        color: Colors.tintColor
+      },
+    };
   };
 
   isDeleting = false; // todo workaround to handle async actions from swipeable component
@@ -301,17 +308,9 @@ export default class ActiveListScreen extends React.Component {
             marginVertical: 10,
             paddingTop: 15,
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
           }}
         >
-          <Text style={{
-            fontSize: 22,
-            fontWeight: '500',
-            padding: 5,
-            color: Colors.tintColor
-          }}>
-            {this.state.currentList.label}
-          </Text>
           <Button
             onPress={() => {
               console.log("show edit")
