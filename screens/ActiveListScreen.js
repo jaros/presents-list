@@ -4,7 +4,6 @@ import {
   Button,
   ScrollView,
   StyleSheet,
-  Text,
   View,
   KeyboardAvoidingView,
   Keyboard,
@@ -12,14 +11,12 @@ import {
 import Colors from '../constants/Colors';
 import TodoItem from '../components/TodoItem';
 import TextEdit from '../components/TextEdit';
-import { Header } from 'react-navigation';
-import { todoItemsMetaList } from '../components/SelectListsView';
 import TodoItemEdit from '../components/TodoItemEdit';
 import SortableList from 'react-native-sortable-list';
-import {ANIMATION_DURATION} from '../constants/Layout';
+import { ANIMATION_DURATION } from '../constants/Layout';
 
 export default class ActiveListScreen extends React.Component {
-  static navigationOptions =  ({ navigation }) => {
+  static navigationOptions = ({ navigation }) => {
     return {
       title: navigation.getParam('name', 'Active'),
       headerTitleStyle: {
@@ -34,31 +31,25 @@ export default class ActiveListScreen extends React.Component {
 
   constructor(props) {
     super(props);
+    const listId = props.navigation.getParam('id', 'NO-ID');
     this.state = {
       items: [],
-      metaList: {},
-      currentList: {},
+      currentList: {showDone: true}, // mock currentList - we don't save meta property here
+      listId: listId,
       isEdit: false,
       isSwiping: false,
       currentlyOpenSwipeable: null,
     };
-
-    this.loadMetaList();
-
-    const willFocusSubscription = this.props.navigation.addListener(
-      'willFocus',
-      () => {
-        this.loadMetaList();
-      }
-    );
+    this.loadStoredItems('TODO_ITEMS_' + listId);
   }
 
   listKey = () => {
-    return 'TODO_ITEMS_' + this.state.currentList.id;
+    return 'TODO_ITEMS_' + this.state.listId; 
   };
 
-  loadStoredItems = () => {
-    AsyncStorage.getItem(this.listKey()).then(value => {
+  loadStoredItems = (listId) => {
+    let id = listId ? listId : this.listKey();
+    AsyncStorage.getItem(id).then(value => {
       if (value) {
         this.assignItems(value);
       }
@@ -82,30 +73,6 @@ export default class ActiveListScreen extends React.Component {
 
   notOrdered = (list) => list.some(it => it.order === undefined)
 
-  loadMetaList = () => {
-    AsyncStorage.getItem('TODO_ITEMS_META_LIST').then(value => {
-      if (value && JSON.parse(value).links.length !== 0) {
-        const meta = JSON.parse(value);
-        this.setState({
-          metaList: meta,
-          currentList: meta.links.find(it => it.id === meta.active),
-          items: []
-        }, this.loadStoredItems);
-      } else { // init first time
-        this.setState({
-          metaList: todoItemsMetaList,
-          currentList: todoItemsMetaList.links[0],
-          items: []
-        }, this.saveMetaList);
-      }
-    }).catch(err => console.log(err));
-  };
-
-  saveMetaList = () => {
-    console.log('saving metaList', this.state.metaList);
-    AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(this.state.metaList));
-  };
-
   storeItems = (list) => {
     if (list === undefined) {
       list = this.state.items
@@ -116,12 +83,8 @@ export default class ActiveListScreen extends React.Component {
   toggleShowDoneItems = () => {
     this.setState(previousState => {
       let isShowDone = previousState.currentList.showDone;
-
-      const objIndex = previousState.metaList.links.findIndex((obj => obj.id == previousState.currentList.id));
-      previousState.metaList.links[objIndex].showDone = !isShowDone;
-
-      return { metaList: previousState.metaList };
-    }, this.saveMetaList);
+      return { currentList: {showDone: !isShowDone} };
+    });
   };
 
   deleteItem = (key) => {
@@ -172,24 +135,9 @@ export default class ActiveListScreen extends React.Component {
           order: (previousState.items.length + 1) * 100,
         }])
       }
-    }, () => this.storeItems().then(() => 
-     setTimeout(this.scrollView.scrollToEnd, ANIMATION_DURATION)
+    }, () => this.storeItems().then(() =>
+      setTimeout(this.scrollView.scrollToEnd, ANIMATION_DURATION)
     ));
-  };
-
-
-  onListNameUpdate = (value) => {
-    this.setState(previousState => {
-      const objIndex = previousState.metaList.links.findIndex((obj => obj.id == this.state.currentList.id));
-      previousState.metaList.links[objIndex].label = value;
-      return {
-        metaList: {
-          ...previousState.metaList,
-          links: previousState.metaList.links
-        },
-        currentList: previousState.metaList.links[objIndex]
-      }
-    }, this.saveMetaList);
   };
 
   onSwipeStart = () => this.setState({ isSwiping: true });
@@ -244,13 +192,13 @@ export default class ActiveListScreen extends React.Component {
             )
         }
 
-        {/* {
+        {
           (this.state.items.filter(it => it.done) || []).length !== 0 &&
           <Button
             color={Colors.logoMainColor}
             onPress={this.toggleShowDoneItems}
             title={this.state.currentList.showDone ? "Hide done" : "Show done"} />
-        } */}
+        }
       </View>
     </ScrollView>
   }
@@ -286,7 +234,6 @@ export default class ActiveListScreen extends React.Component {
 
   render() {
     return (
-      
       <KeyboardAvoidingView
         style={styles.container}
         behavior="padding"
@@ -318,26 +265,26 @@ export default class ActiveListScreen extends React.Component {
           />
         </View>
 
-        
-          {!this.state.isEdit &&
-            this.showActiveTodos()
-          }
-          {this.state.isEdit &&
-            this.showEditTodos()
-          }
 
-          {this.state.isEdit === false &&
-            <View style={[styles.header]}>
-              <TextEdit
-                onSave={this.addItem}
-                onFocus={() => { setTimeout(this.scrollView.scrollToEnd, 100); console.log('scroll to the end'); }}
-                initValue=''
-                saveLabel='Add note'
-                textInputPlaceholder='Type here to add item!'
-              />
-            </View>
-          }
-        
+        {!this.state.isEdit &&
+          this.showActiveTodos()
+        }
+        {this.state.isEdit &&
+          this.showEditTodos()
+        }
+
+        {this.state.isEdit === false &&
+          <View style={[styles.header]}>
+            <TextEdit
+              onSave={this.addItem}
+              onFocus={() => { setTimeout(this.scrollView.scrollToEnd, 100); console.log('scroll to the end'); }}
+              initValue=''
+              saveLabel='Add note'
+              textInputPlaceholder='Type here to add item!'
+            />
+          </View>
+        }
+
       </KeyboardAvoidingView>
     );
   }

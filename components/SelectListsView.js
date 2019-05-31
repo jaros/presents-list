@@ -28,8 +28,7 @@ export default class SelectListsView extends React.Component {
       showRenameList: false,
     };
 
-    // todo - now it can be done onlt once - when app is init
-    const willFocusSubscription = this.props.navigation.addListener('willFocus', this.loadMetaList);
+    this.loadMetaList();
   }
 
   activeList = () => {
@@ -221,7 +220,7 @@ export default class SelectListsView extends React.Component {
   };
 
   navigateToActive = (link) => {
-    this.props.navigation.navigate('ActiveList', { name: link.label });
+    this.props.navigation.navigate('ActiveList', { name: link.label, id: link.id });
   };
 }
 
