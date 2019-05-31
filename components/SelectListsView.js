@@ -196,6 +196,7 @@ export default class SelectListsView extends React.Component {
 
           {this.state.editableList &&
             <RenameList
+              autoFocus={true}
               onUpdate={this.onListNameUpdate}
               initValue={this.editableListName}
               show={this.state.showRenameList}
@@ -259,7 +260,7 @@ class ListItem extends React.Component {
   }
 
   render() {
-    const { link, isActive, isEdit, onPressLink, getListContent, toggleShowRenameList, doListDelete } = this.props;
+    const { link, isActive, isEdit, onPressLink, getListContent, toggleShowRenameList } = this.props;
     const rowStyles = [
       styles.option,
       { opacity: this._animated },

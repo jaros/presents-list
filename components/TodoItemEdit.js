@@ -114,6 +114,7 @@ export default class TodoItemEdit extends React.Component {
           initValue={data.text}
           show={this.state.showRenameList}
           toggleShow={this.toggleShowRenameList}
+          autoFocus={true}
         />
       </Animated.View>
     );
