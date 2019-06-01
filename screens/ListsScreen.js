@@ -29,12 +29,12 @@ export default class ListsScreen extends React.Component {
       },
       headerLeft: (
         <TouchableOpacity
-            background={'#66ff40'}
-            onPress={() => navigation.getParam('addNewList')()}>
-            <View style={[styles.optionIconContainer, { paddingLeft: 15 }]}>
-              <Ionicons name="ios-add" size={35} color={Colors.iosDefault} />
-            </View>
-          </TouchableOpacity>
+          background={'#66ff40'}
+          onPress={() => navigation.getParam('addNewList')()}>
+          <View style={[styles.optionIconContainer, { paddingLeft: 15 }]}>
+            <Ionicons name="ios-add" size={35} color={Colors.iosDefault} />
+          </View>
+        </TouchableOpacity>
       ),
       headerRight: (
         <View style={{ paddingRight: 10 }}>
@@ -215,21 +215,26 @@ export default class ListsScreen extends React.Component {
               onPressLink={this._handlePressListLink}
               getListContent={this.getListContent}
               toggleShowRenameList={this.toggleShowRenameList}
-              doListDelete={this.doListDelete}
-            />)}
-
-          {this.state.editableList &&
-            <RenameList
-              autoFocus={true}
-              onUpdate={this.onListNameUpdate}
-              initValue={this.editableListName}
-              show={this.state.showRenameList}
-              toggleShow={this.toggleShowRenameList}
-            />
-          }
+              doListDelete={this.doListDelete} />
+          )}
         </ScrollView>
+        {this.showModalRenameInput()}
       </View>
     );
+  }
+
+  showModalRenameInput = () => {
+    if (this.state.editableList) {
+      return (
+        <RenameList
+          autoFocus={true}
+          onUpdate={this.onListNameUpdate}
+          initValue={this.editableListName}
+          show={this.state.showRenameList}
+          toggleShow={this.toggleShowRenameList}
+        />
+      )
+    } else return null;
   }
 
   _handlePressListLink = (link) => () => {
