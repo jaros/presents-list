@@ -30,7 +30,7 @@ export default class ListsScreen extends React.Component {
       headerLeft: (
         <TouchableOpacity
           background={'#66ff40'}
-          onPress={() => navigation.getParam('addNewList')()}>
+          onPress={() => navigation.getParam('optionalAddNewlist')()}>
           <View style={[styles.optionIconContainer, { paddingLeft: 15 }]}>
             <Ionicons name="ios-add" size={35} color={Colors.iosDefault} />
           </View>
@@ -62,7 +62,7 @@ export default class ListsScreen extends React.Component {
   componentDidMount() {
     this.props.navigation.setParams({
       toggleEditAction: this.toggleEditButton,
-      addNewList: this.addNewList,
+      optionalAddNewlist: this.optionalAddNewlist,
       headerRightBtnLabel: "Edit",
     });
   }
@@ -72,8 +72,12 @@ export default class ListsScreen extends React.Component {
   };
 
   editableListName = () => {
-    const list = this.state.metaList.links.find(it => it.id === this.state.editableList);
-    return list ? list.label : 'no list selected';
+    if (this.state.editableList) {
+      const list = this.state.metaList.links.find(it => it.id === this.state.editableList);
+      return list ? list.label : 'no list selected';
+    } else {
+      return 'List ' + (this.state.metaList.links.length + 1);
+    }
   };
 
   toggleShowRenameList = (listId) => {
@@ -170,13 +174,13 @@ export default class ListsScreen extends React.Component {
     }
   });
 
-  addNewList = () => {
+  addNewList = (listName) => {
     const id = new Date().getTime();
     this.setState(previousState => {
       oldLinks = previousState.metaList.links;
       let newList = {
         id,
-        label: 'List ' + (oldLinks.length + 1),
+        label: listName,
         showDone: true,
       }
       oldLinks.unshift(newList);
@@ -188,11 +192,10 @@ export default class ListsScreen extends React.Component {
       };
     }, () => {
       this.saveMetaList();
-      this.toggleShowRenameList(id);
-      //let links = this.state.metaList.links;
-      //this._handlePressListLink(links[0])();
     });
   };
+
+  optionalAddNewlist = this.toggleShowRenameList;
 
   toggleEditButton = () => {
     const isEdit = !this.state.edit
@@ -218,23 +221,15 @@ export default class ListsScreen extends React.Component {
               doListDelete={this.doListDelete} />
           )}
         </ScrollView>
-        {this.showModalRenameInput()}
-      </View>
-    );
-  }
-
-  showModalRenameInput = () => {
-    if (this.state.editableList) {
-      return (
         <RenameList
           autoFocus={true}
-          onUpdate={this.onListNameUpdate}
+          onUpdate={this.state.editableList ? this.onListNameUpdate : this.addNewList}
           initValue={this.editableListName}
           show={this.state.showRenameList}
           toggleShow={this.toggleShowRenameList}
         />
-      )
-    } else return null;
+      </View>
+    );
   }
 
   _handlePressListLink = (link) => () => {
