@@ -24,12 +24,12 @@ export default class TextEdit extends React.Component {
   };
 
   render() {
-    const {onFocus, textInputPlaceholder, autoFocus} = this.props;
+    const {onFocus, textInputPlaceholder, autoFocus, multiline} = this.props;
     return (
       <View style={styles.textInputContainer}>
         <View style={{
             flexDirection: 'row',
-            height: 35,
+            minHeight: 35,
             width: 60,
             flexGrow: 1,
             borderWidth: 1,
@@ -40,6 +40,7 @@ export default class TextEdit extends React.Component {
              clearButtonMode='while-editing'
              selectTextOnFocus={false}
              autoFocus={!!autoFocus}
+             multiline={!!multiline}
              onFocus={() => {
                if (this.props.onFocus) this.props.onFocus()
              }
@@ -49,7 +50,7 @@ export default class TextEdit extends React.Component {
              onChangeText={(text) => this.setState({text: text})}
            />
         </View>
-          <TouchableHighlight onPress={this.onSavePressed} underlayColor="white">
+          <TouchableHighlight style={{flexDirection: 'column'}} onPress={this.onSavePressed} underlayColor="white">
              <View style={styles.button}>
                 <Text style={styles.buttonText}>{this.props.saveLabel}</Text>
               </View>
@@ -70,7 +71,8 @@ const styles = StyleSheet.create({
     flexGrow: 1
   },
   button: {
-    height: 35,
+    flex: 1,
+    minHeight: 35,
     alignItems: 'center',
     justifyContent: 'center',
     borderColor: Colors.logoLightColor,

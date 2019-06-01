@@ -126,7 +126,7 @@ export default class TodoItem extends React.Component {
 const styles = StyleSheet.create({
   item: {
     padding: 10,
-    fontSize: 18,
+    fontSize: 15,
     minHeight: 44,
     flexGrow: 1,
     flexWrap: 'wrap',
@@ -144,7 +144,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#fff',
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     //height: 44,
     flex: 1,
     //marginTop: 7,
