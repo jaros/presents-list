@@ -5,17 +5,21 @@ import Colors from '../constants/Colors';
 import { ANIMATION_DURATION } from '../constants/Layout';
 import { ActionIcon } from '../components/TodoItem';
 import RenameList from '../components/RenameList';
+import * as firebase from 'firebase';
 
-export const todoItemsMetaList = {
-  active: 1,
-  links: [
-    {
-      id: 1,
-      label: 'My list ONE',
-      showDone: true,
-    }
-  ]
+const firebaseConfig = {
+  apiKey: "AIzaSyDmELLjEJAx5hxcYphFGD3821WVSOTIsWw",
+  authDomain: "check-tasks.firebaseapp.com",
+  databaseURL: "https://check-tasks.firebaseio.com",
+  projectId: "check-tasks",
+  storageBucket: "check-tasks.appspot.com",
+  messagingSenderId: "806572063767",
+  appId: "1:806572063767:web:899014c783991a75"
 };
+
+const userid = 'jaros';
+
+firebase.initializeApp(firebaseConfig);
 
 export default class ListsScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -50,13 +54,69 @@ export default class ListsScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      metaList: todoItemsMetaList,
+      metaList: this.todoItemsMetaList(),
       edit: false,
       editableList: 0,
       showRenameList: false,
     };
 
-    this.loadMetaList();
+    this.loadAndSyncronizeMetaList().then(() => this.monitorRemoteMetaListChanges());
+  }
+
+  loadAndSyncronizeMetaList = async () => {
+    const localData = await this.loadLocalMetaList();
+    const remoteData = await this.loadRemoteMetaList();
+
+    if (localData && !remoteData) {
+      return firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).set(metaList);
+    } else if (!localData && remoteData) {
+      this.setState({ metaList: remoteData });
+      return AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(remoteData));
+    } else if (!localData && !remoteData) {
+      return initFirstTime();
+    }
+
+  }
+
+  loadLocalMetaList = async () => {
+    const value = await AsyncStorage.getItem('TODO_ITEMS_META_LIST');
+    const dataExists = value && JSON.parse(value).links.length !== 0;
+    if (dataExists) {
+      const metaList = JSON.parse(value);
+      this.setState({ metaList });
+      return metaList;
+    } else {
+      return null;
+    }
+  }
+
+  loadRemoteMetaList = async () => {
+    let snapshot = await firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).once('value');
+    return snapshot.val();
+  }
+
+  monitorRemoteMetaListChanges = async () => {
+    try {
+      this.metaListRef = firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).on('value', async (snapshot) => {
+        let metaList = snapshot.val();
+        if (!metaList) {
+          this.initFirstTime();
+        } else {
+          console.log("meta list data: " + metaList);
+          this.setState({ metaList });
+          AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(metaList));
+        }
+      });
+    }
+    catch (err) {
+      return console.log(err);
+    }
+  };
+
+  initFirstTime = () => {
+    const metaList = this.todoItemsMetaList();
+    this.setState({ metaList });
+    return this.saveMetaList(metaList);
   }
 
   componentDidMount() {
@@ -65,6 +125,12 @@ export default class ListsScreen extends React.Component {
       optionalAddNewlist: this.optionalAddNewlist,
       headerRightBtnLabel: "Edit",
     });
+  }
+
+  componentWillUnmount() {
+    if (this.metaListRef) {
+      this.metaListRef.off();
+    }
   }
 
   activeList = () => {
@@ -79,6 +145,22 @@ export default class ListsScreen extends React.Component {
       return 'List ' + (this.state.metaList.links.length + 1);
     }
   };
+
+  todoItemsMetaList = () => {
+    const newId = this.generateId()
+    return {
+      active: newId,
+      links: [
+        {
+          id: newId,
+          label: 'My list ONE',
+          showDone: true,
+        }
+      ]
+    }
+  };
+
+  generateId = () => new Date().getTime()
 
   toggleShowRenameList = (listId) => {
 
@@ -103,52 +185,12 @@ export default class ListsScreen extends React.Component {
     }, this.saveMetaList);
   };
 
-  loadMetaList = async () => {
-    try {
-      const value = await AsyncStorage.getItem('TODO_ITEMS_META_LIST');
-      console.log('raw value', value)
-      if (value) {
-        const metaList = JSON.parse(value);
-        console.log('metalist', value)
-        if (metaList.links.length === 0) {
-          this.initFirstTime();
-        } else {
-          this.setState({ metaList });
-        }
-      } else { // init first time
-        this.initFirstTime();
-      }
+  saveMetaList = (metaList) => {
+    if (!metaList) {
+      metaList = this.state.metaList
     }
-    catch (err) {
-      return console.log(err);
-    }
-  };
-
-  initFirstTime = () => this.setState({
-    metaList: todoItemsMetaList
-  }, this.saveMetaList);
-
-  itemsToList = (items) => {
-    if (items) {
-      const labels = JSON.parse(items).map(item => item.text);
-      let result = '';
-      labels.forEach(label => result += (`- ${label}\n`));
-      return result;
-    }
-    return 'empty list';
-  };
-
-  getListContent = async (listId) => {
-    try {
-      return this.itemsToList(await AsyncStorage.getItem('TODO_ITEMS_' + listId));
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  };
-
-  saveMetaList = () => {
-    AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(this.state.metaList));
+    AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(metaList));
+    return firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).set(metaList);
   };
 
   doListDelete = id => this.setState(previousState => {
@@ -164,18 +206,16 @@ export default class ListsScreen extends React.Component {
       }
     }
   }, () => {
-    this.saveMetaList();
     AsyncStorage.removeItem('TODO_ITEMS_' + id);
-    if (id == 1) { // backward compatibility, TODO remove on release
-      AsyncStorage.removeItem('TODO_ITEMS');
-    }
     if (this.state.metaList.links.length === 0) {
       this.initFirstTime()
+    } else {
+      this.saveMetaList();
     }
   });
 
   addNewList = (listName) => {
-    const id = new Date().getTime();
+    const id = this.generateId();
     this.setState(previousState => {
       oldLinks = previousState.metaList.links;
       let newList = {
@@ -216,7 +256,6 @@ export default class ListsScreen extends React.Component {
               isActive={link.id == this.state.metaList.active}
               isEdit={this.state.edit}
               onPressLink={this._handlePressListLink}
-              getListContent={this.getListContent}
               toggleShowRenameList={this.toggleShowRenameList}
               doListDelete={this.doListDelete} />
           )}
@@ -283,8 +322,27 @@ class ListItem extends React.Component {
     );
   }
 
+  getListContent = async (listId) => {
+    const itemsToList = items => {
+      if (items) {
+        return "- " + JSON.parse(items).map(item => item.text).join("\n- ");
+        // let result = '';
+        // labels.forEach(label => result += (`- ${label}\n`));
+        // return result;
+      }
+      return 'empty list';
+    };
+
+    try {
+      return itemsToList(await AsyncStorage.getItem('TODO_ITEMS_' + listId));
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
   render() {
-    const { link, isActive, isEdit, onPressLink, getListContent, toggleShowRenameList } = this.props;
+    const { link, isActive, isEdit, onPressLink, toggleShowRenameList } = this.props;
     const rowStyles = [
       styles.option,
       { opacity: this._animated },
@@ -330,8 +388,9 @@ class ListItem extends React.Component {
                   Share.share(
                     {
                       title: `Share a list ${link.label} with friend`,
-                      message: await getListContent(link.id),
-                      url: 'https://github.com/jaros/check-list',
+                      message: await this.getListContent(link.id)
+                    }, {
+                      subject: `Content of '${link.label}'`
                     }
                   );
                 }}
