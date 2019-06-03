@@ -17,7 +17,7 @@ const firebaseConfig = {
   appId: "1:806572063767:web:899014c783991a75"
 };
 
-const userid = 'jaros';
+export const userid = 'jaros';
 
 firebase.initializeApp(firebaseConfig);
 
@@ -60,7 +60,7 @@ export default class ListsScreen extends React.Component {
       showRenameList: false,
     };
 
-    this.loadAndSyncronizeMetaList().then(() => this.monitorRemoteMetaListChanges());
+    this.loadAndSyncronizeMetaList();
   }
 
   loadAndSyncronizeMetaList = async () => {
@@ -68,8 +68,27 @@ export default class ListsScreen extends React.Component {
     const remoteData = await this.loadRemoteMetaList();
 
     if (localData && !remoteData) {
-      return firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).set(metaList);
-    } else if (!localData && remoteData) {
+      firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).set(localData);
+
+      var updates = {};
+      // backward compatibility check
+      const linkToUpdate = async link => {
+        const list = await AsyncStorage.getItem('TODO_ITEMS_' + link.id);
+        if (!list) {
+          // skip empty content lists
+          return link.id;
+        }
+        const listContentParsed = JSON.parse(list).reduce((acc, cur) => {
+          acc[cur.key] = cur;
+          return acc;
+        }, {})
+        updates[`/TODO_ITEMS/${userid}/${link.id}`] = listContentParsed;
+        return link.id;
+      };
+      await Promise.all(localData.links.map(linkToUpdate));
+      return await firebase.database().ref().update(updates);
+    } else if (remoteData) {
+      // what if there is nother user data ? nah - ignore this case for now
       this.setState({ metaList: remoteData });
       return AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(remoteData));
     } else if (!localData && !remoteData) {
@@ -95,6 +114,7 @@ export default class ListsScreen extends React.Component {
     return snapshot.val();
   }
 
+  // it's not needed until more advance list sharing between users
   monitorRemoteMetaListChanges = async () => {
     try {
       this.metaListRef = firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).on('value', async (snapshot) => {
@@ -207,6 +227,7 @@ export default class ListsScreen extends React.Component {
     }
   }, () => {
     AsyncStorage.removeItem('TODO_ITEMS_' + id);
+    firebase.database().ref('TODO_ITEMS/' + userid + '/' + id).set(null);
     if (this.state.metaList.links.length === 0) {
       this.initFirstTime()
     } else {
@@ -218,6 +239,7 @@ export default class ListsScreen extends React.Component {
     const id = this.generateId();
     this.setState(previousState => {
       oldLinks = previousState.metaList.links;
+      // TODO: store userId in list details => requires registration
       let newList = {
         id,
         label: listName,
@@ -322,6 +344,15 @@ class ListItem extends React.Component {
     );
   }
 
+  loadListDetails = async () => {
+    const localList = await AsyncStorage.getItem('TODO_ITEMS_' + listId);
+    if (!localList) {
+      let snapshot = await firebase.database().ref('TODO_ITEMS/' + userid + '/' + listId).once('value');
+      return snapshot.val();
+    }
+    return localList;
+  }
+
   getListContent = async (listId) => {
     const itemsToList = items => {
       if (items) {
@@ -334,7 +365,7 @@ class ListItem extends React.Component {
     };
 
     try {
-      return itemsToList(await AsyncStorage.getItem('TODO_ITEMS_' + listId));
+      return itemsToList(await this.loadListDetails());
     } catch (error) {
       console.error(error);
       return null;

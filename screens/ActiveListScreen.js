@@ -14,6 +14,8 @@ import TextEdit from '../components/TextEdit';
 import TodoItemEdit from '../components/TodoItemEdit';
 import SortableList from 'react-native-sortable-list';
 import { ANIMATION_DURATION } from '../constants/Layout';
+import * as firebase from 'firebase';
+import {userid} from './ListsScreen';
 
 export default class ActiveListScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -66,13 +68,18 @@ export default class ActiveListScreen extends React.Component {
     let id = listId ? listId : this.listKey();
     AsyncStorage.getItem(id).then(value => {
       if (value) {
-        this.assignItems(value);
+        this.assignItems(JSON.parse(value));
+      } else {
+        let snapshot = firebase.database().ref(`/TODO_ITEMS/${userid}/${this.state.listId}`).once('value');
+        if (snapshot.val()) {
+          this.assignItems(snapshot.val()); 
+          this.storeItems(snapshot.val());
+        }
       }
     }).catch(err => console.log(err));
   };
 
-  assignItems = (jsonValue) => {
-    let list = JSON.parse(jsonValue);
+  assignItems = list => {
     if (this.notOrdered(list)) {
       console.log('adjust list order')
       list = list.map((item, idx) => ({
@@ -92,6 +99,7 @@ export default class ActiveListScreen extends React.Component {
     if (list === undefined) {
       list = this.state.items
     }
+    firebase.database().ref('TODO_ITEMS/' + userid + '/' + this.state.listId).set(list);
     return AsyncStorage.setItem(this.listKey(), JSON.stringify(list));
   };
 
@@ -266,33 +274,6 @@ export default class ActiveListScreen extends React.Component {
         behavior="padding"
         enabled
       >
-
-        {/* <View
-          style={{
-            marginHorizontal: 20,
-            marginVertical: 10,
-            paddingTop: 15,
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-          }}
-        >
-          <Button
-            onPress={() => {
-              console.log("show edit")
-              Keyboard.dismiss()
-              if (this.state.isEdit) {
-                this.state.items.sort((obj1, obj2) => obj1.order - obj2.order)
-              } else {
-                this.setState({ currentlyOpenSwipeable: null });
-              }
-              this.setState((state, props) => ({ isEdit: !state.isEdit }));
-            }}
-            title={this.state.isEdit ? "Done" : "Edit"}
-            accessibilityLabel="Edit"
-          />
-        </View> */}
-
-
         {!this.state.isEdit &&
           this.showActiveTodos()
         }
@@ -321,7 +302,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    //backgroundColor: '#efecec',
   },
   header: {
     backgroundColor: Colors.tabBar,
@@ -330,8 +310,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   listContainer: {
-    // paddingLeft: 15,
-    // paddingRight: 15,
     paddingBottom: 10,
   },
 
