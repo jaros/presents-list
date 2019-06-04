@@ -15,7 +15,6 @@ import TodoItemEdit from '../components/TodoItemEdit';
 import SortableList from 'react-native-sortable-list';
 import { ANIMATION_DURATION } from '../constants/Layout';
 import * as firebase from 'firebase';
-import {userid} from './ListsScreen';
 
 export default class ActiveListScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -49,6 +48,7 @@ export default class ActiveListScreen extends React.Component {
       isEdit: false,
       isSwiping: false,
       currentlyOpenSwipeable: null,
+      userid: firebase.auth().currentUser.uid,
     };
     this.loadStoredItems('TODO_ITEMS_' + listId);
   }
@@ -70,7 +70,7 @@ export default class ActiveListScreen extends React.Component {
       if (value) {
         this.assignItems(JSON.parse(value));
       } else {
-        firebase.database().ref(`/TODO_ITEMS/${userid}/${this.state.listId}`).once('value').then(snapshot => {
+        firebase.database().ref(`/TODO_ITEMS/${this.state.userid}/${this.state.listId}`).once('value').then(snapshot => {
           if (snapshot.val()) {
             this.assignItems(snapshot.val()); 
             this.storeItems(snapshot.val());
@@ -100,7 +100,7 @@ export default class ActiveListScreen extends React.Component {
     if (list === undefined) {
       list = this.state.items
     }
-    firebase.database().ref('TODO_ITEMS/' + userid + '/' + this.state.listId).set(list);
+    firebase.database().ref('TODO_ITEMS/' + this.state.userid + '/' + this.state.listId).set(list);
     return AsyncStorage.setItem(this.listKey(), JSON.stringify(list));
   };
 

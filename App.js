@@ -2,11 +2,35 @@ import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
+import FirebaseLogin from "./FirebaseLogin";
+import firebase from "firebase";
 
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
+    user: null
   };
+
+  constructor(props) {
+    super(props);
+    firebase.auth().onAuthStateChanged(user => {
+      this.setState({ user });
+      // if (user) {
+      //   // User is signed in.
+      //   var displayName = user.displayName;
+      //   var email = user.email;
+      //   var emailVerified = user.emailVerified;
+      //   var photoURL = user.photoURL;
+      //   var isAnonymous = user.isAnonymous;
+      //   var uid = user.uid;
+      //   var providerData = user.providerData;
+      //   // ...
+      // } else {
+      //   // User is signed out.
+      //   // ...
+      // }
+    });
+  }
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {
@@ -18,11 +42,16 @@ export default class App extends React.Component {
         />
       );
     } else {
+      if (this.state.user) {
+        return (
+          <View style={styles.container}>
+            {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+            <AppNavigator />
+          </View>
+        );
+      }
       return (
-        <View style={styles.container}>
-          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          <AppNavigator />
-        </View>
+        <FirebaseLogin login={user => console.log(user)} />
       );
     }
   }

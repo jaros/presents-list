@@ -17,8 +17,6 @@ const firebaseConfig = {
   appId: "1:806572063767:web:899014c783991a75"
 };
 
-export const userid = 'jaros';
-
 firebase.initializeApp(firebaseConfig);
 
 export default class ListsScreen extends React.Component {
@@ -41,11 +39,20 @@ export default class ListsScreen extends React.Component {
         </TouchableOpacity>
       ),
       headerRight: (
-        <View style={{ paddingRight: 10 }}>
+        <View style={{ paddingRight: 10, flexDirection: 'row', alignItems: 'center' }}>
           <Button
             onPress={() => navigation.getParam('toggleEditAction')()}
             title={"" + navigation.getParam('headerRightBtnLabel', '')}
           />
+          <TouchableOpacity
+            background={'#66ff40'}
+            onPress={() =>
+              firebase.auth().signOut().then(() => console.log('signed out')).catch(error => console.log(error))
+            }>
+            <View style={[styles.optionIconContainer, { paddingLeft: 15 }]}>
+              <Ionicons name="ios-log-out" size={28} color={Colors.iosDefault} />
+            </View>
+          </TouchableOpacity>
         </View>
       ),
     }
@@ -58,6 +65,7 @@ export default class ListsScreen extends React.Component {
       edit: false,
       editableList: 0,
       showRenameList: false,
+      userid: firebase.auth().currentUser.uid,
     };
 
     this.loadAndSyncronizeMetaList();
@@ -68,13 +76,13 @@ export default class ListsScreen extends React.Component {
     const remoteData = await this.loadRemoteMetaList();
 
     if (localData && !remoteData) {
-      firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).set(localData);
+      firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(localData);
 
       // store all local lists to remote db - backward compatibility
       const linkToUpdate = async (previousUpdates, link) => {
         const list = await AsyncStorage.getItem('TODO_ITEMS_' + link.id);
         const updates = await previousUpdates;
-        
+
         if (!list) {
           // skip empty content lists
           return updates;
@@ -83,10 +91,10 @@ export default class ListsScreen extends React.Component {
           acc[cur.key] = cur;
           return acc;
         }, {})
-        updates[`/TODO_ITEMS/${userid}/${link.id}`] = listContentParsed;
+        updates[`/TODO_ITEMS/${this.state.userid}/${link.id}`] = listContentParsed;
         return updates;
       };
-      
+
       const firebaseUpdates = await localData.links.reduce(linkToUpdate, {});
       return await firebase.database().ref().update(firebaseUpdates);
     } else if (remoteData) {
@@ -112,14 +120,14 @@ export default class ListsScreen extends React.Component {
   }
 
   loadRemoteMetaList = async () => {
-    let snapshot = await firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).once('value');
+    let snapshot = await firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).once('value');
     return snapshot.val();
   }
 
   // it's not needed until more advance list sharing between users
   monitorRemoteMetaListChanges = async () => {
     try {
-      this.metaListRef = firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).on('value', async (snapshot) => {
+      this.metaListRef = firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).on('value', async (snapshot) => {
         let metaList = snapshot.val();
         if (!metaList) {
           this.initFirstTime();
@@ -212,7 +220,7 @@ export default class ListsScreen extends React.Component {
       metaList = this.state.metaList
     }
     AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(metaList));
-    return firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).set(metaList);
+    return firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(metaList);
   };
 
   doListDelete = id => this.setState(previousState => {
@@ -229,7 +237,7 @@ export default class ListsScreen extends React.Component {
     }
   }, () => {
     AsyncStorage.removeItem('TODO_ITEMS_' + id);
-    firebase.database().ref('TODO_ITEMS/' + userid + '/' + id).set(null);
+    firebase.database().ref('TODO_ITEMS/' + this.state.userid + '/' + id).set(null);
     if (this.state.metaList.links.length === 0) {
       this.initFirstTime()
     } else {
@@ -349,7 +357,7 @@ class ListItem extends React.Component {
   loadListDetails = async () => {
     const localList = await AsyncStorage.getItem('TODO_ITEMS_' + listId);
     if (!localList) {
-      let snapshot = await firebase.database().ref('TODO_ITEMS/' + userid + '/' + listId).once('value');
+      let snapshot = await firebase.database().ref('TODO_ITEMS/' + firebase.auth().currentUser.uid + '/' + listId).once('value');
       return snapshot.val();
     }
     return localList;
