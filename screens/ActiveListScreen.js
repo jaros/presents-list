@@ -64,17 +64,18 @@ export default class ActiveListScreen extends React.Component {
     return 'TODO_ITEMS_' + this.state.listId;
   };
 
-  loadStoredItems = (listId) => {
+  loadStoredItems = async (listId) => {
     let id = listId ? listId : this.listKey();
     AsyncStorage.getItem(id).then(value => {
       if (value) {
         this.assignItems(JSON.parse(value));
       } else {
-        let snapshot = firebase.database().ref(`/TODO_ITEMS/${userid}/${this.state.listId}`).once('value');
-        if (snapshot.val()) {
-          this.assignItems(snapshot.val()); 
-          this.storeItems(snapshot.val());
-        }
+        firebase.database().ref(`/TODO_ITEMS/${userid}/${this.state.listId}`).once('value').then(snapshot => {
+          if (snapshot.val()) {
+            this.assignItems(snapshot.val()); 
+            this.storeItems(snapshot.val());
+          }
+        });
       }
     }).catch(err => console.log(err));
   };
