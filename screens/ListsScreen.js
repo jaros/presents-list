@@ -70,23 +70,25 @@ export default class ListsScreen extends React.Component {
     if (localData && !remoteData) {
       firebase.database().ref('TODO_ITEMS_META_LIST/' + userid).set(localData);
 
-      var updates = {};
-      // backward compatibility check
-      const linkToUpdate = async link => {
+      // store all local lists to remote db - backward compatibility
+      const linkToUpdate = async (previousUpdates, link) => {
         const list = await AsyncStorage.getItem('TODO_ITEMS_' + link.id);
+        const updates = await previousUpdates;
+        
         if (!list) {
           // skip empty content lists
-          return link.id;
+          return updates;
         }
         const listContentParsed = JSON.parse(list).reduce((acc, cur) => {
           acc[cur.key] = cur;
           return acc;
         }, {})
         updates[`/TODO_ITEMS/${userid}/${link.id}`] = listContentParsed;
-        return link.id;
+        return updates;
       };
-      await Promise.all(localData.links.map(linkToUpdate));
-      return await firebase.database().ref().update(updates);
+      
+      const firebaseUpdates = await localData.links.reduce(linkToUpdate, {});
+      return await firebase.database().ref().update(firebaseUpdates);
     } else if (remoteData) {
       // what if there is nother user data ? nah - ignore this case for now
       this.setState({ metaList: remoteData });
