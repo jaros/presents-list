@@ -72,54 +72,55 @@ export default class ListsScreen extends React.Component {
   }
 
   loadAndSyncronizeMetaList = async () => {
-    const localData = await this.loadLocalMetaList();
-    const remoteData = await this.loadRemoteMetaList();
 
-    if (localData && !remoteData) {
-      firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(localData);
-
-      // store all local lists to remote db - backward compatibility
-      const linkToUpdate = async (previousUpdates, link) => {
-        const list = await AsyncStorage.getItem('TODO_ITEMS_' + link.id);
-        const updates = await previousUpdates;
-
-        if (!list) {
-          // skip empty content lists
-          return updates;
-        }
-        const listContentParsed = JSON.parse(list).reduce((acc, cur) => {
-          acc[cur.key] = { 
-            ...cur, 
-            owner: this.state.userid 
-          };
-          return acc;
-        }, {})
-        updates[`/TODO_ITEMS/${this.state.userid}/${link.id}`] = listContentParsed;
-        return updates;
-      };
-
-      const firebaseUpdates = await localData.links.reduce(linkToUpdate, {});
-      return await firebase.database().ref().update(firebaseUpdates);
-    } else if (remoteData) {
-      // what if there is nother user data ? nah - ignore this case for now
-      this.setState({ metaList: remoteData });
-      return AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(remoteData));
-    } else if (!localData && !remoteData) {
-      return initFirstTime();
+    const metaList = await this.loadRemoteMetaList();
+    if (metaList) {
+      this.setState({ metaList });
+    } else {
+      const localData = await this.loadLocalMetaList();
+      if (localData) {
+        this.setState({ metaList: localData });
+        firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(localData);
+        // store all local lists to remote db - backward compatibility
+        return await firebase.database().ref().update(await this.firebaseUpdates(localData));
+      } else {
+        return initFirstTime();
+      }
     }
+  }
 
+  firebaseUpdates = async (localData) => {
+    const linkToUpdate = async (previousUpdates, link) => {
+      const list = await AsyncStorage.getItem('TODO_ITEMS_' + link.id);
+      const updates = await previousUpdates;
+
+      if (!list) {
+        // skip empty content lists
+        return updates;
+      }
+      const listContentParsed = JSON.parse(list).reduce((acc, cur) => {
+        acc[cur.key] = {
+          ...cur,
+          owner: this.state.userid
+        };
+        return acc;
+      }, {})
+      updates[`/TODO_ITEMS/${this.state.userid}/${link.id}`] = listContentParsed;
+      return updates;
+    };
+
+    return await localData.links.reduce(linkToUpdate, {});
   }
 
   loadLocalMetaList = async () => {
     const value = await AsyncStorage.getItem('TODO_ITEMS_META_LIST');
-    const dataExists = value && JSON.parse(value).links.length !== 0;
-    if (dataExists) {
+    if (value) {
       const metaList = JSON.parse(value);
-      this.setState({ metaList });
-      return metaList;
-    } else {
-      return null;
+      if (metaList.links.length !== 0) {
+        return metaList;
+      }
     }
+    return null;
   }
 
   loadRemoteMetaList = async () => {
@@ -137,7 +138,6 @@ export default class ListsScreen extends React.Component {
         } else {
           console.log("meta list data: " + metaList);
           this.setState({ metaList });
-          AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(metaList));
         }
       });
     }
@@ -222,7 +222,6 @@ export default class ListsScreen extends React.Component {
     if (!metaList) {
       metaList = this.state.metaList
     }
-    AsyncStorage.setItem('TODO_ITEMS_META_LIST', JSON.stringify(metaList));
     return firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(metaList);
   };
 
@@ -239,7 +238,6 @@ export default class ListsScreen extends React.Component {
       }
     }
   }, () => {
-    AsyncStorage.removeItem('TODO_ITEMS_' + id);
     firebase.database().ref('TODO_ITEMS/' + this.state.userid + '/' + id).set(null);
     if (this.state.metaList.links.length === 0) {
       this.initFirstTime()
@@ -358,22 +356,13 @@ class ListItem extends React.Component {
     );
   }
 
-  loadListDetails = async () => {
-    const localList = await AsyncStorage.getItem('TODO_ITEMS_' + listId);
-    if (!localList) {
-      let snapshot = await firebase.database().ref('TODO_ITEMS/' + firebase.auth().currentUser.uid + '/' + listId).once('value');
-      return snapshot.val();
-    }
-    return localList;
-  }
+  loadListDetails = async () =>
+    (await firebase.database().ref('TODO_ITEMS/' + firebase.auth().currentUser.uid + '/' + listId).once('value')).val();
 
   getListContent = async (listId) => {
     const itemsToList = items => {
       if (items) {
         return "- " + JSON.parse(items).map(item => item.text).join("\n- ");
-        // let result = '';
-        // labels.forEach(label => result += (`- ${label}\n`));
-        // return result;
       }
       return 'empty list';
     };

@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  AsyncStorage,
   Button,
   ScrollView,
   StyleSheet,
@@ -52,7 +51,7 @@ export default class ActiveListScreen extends React.Component {
       currentlyOpenSwipeable: null,
       userid: firebase.auth().currentUser.uid,
     };
-    this.loadStoredItems('TODO_ITEMS_' + listId);
+    this.loadStoredItems();
   }
 
   componentDidMount() {
@@ -66,18 +65,13 @@ export default class ActiveListScreen extends React.Component {
     return 'TODO_ITEMS_' + this.state.listId;
   };
 
-  loadStoredItems = async (listId) => {
-    let id = listId ? listId : this.listKey();
-    AsyncStorage.getItem(id).then(value => {
-      if (value) {
-        this.assignItems(JSON.parse(value));
-      } else {
-        firebase.database().ref(`/TODO_ITEMS/${this.state.listOwner}/${this.state.listId}`).once('value').then(snapshot => {
-          if (snapshot.val()) {
-            this.assignItems(snapshot.val()); 
-            this.storeItems(snapshot.val());
-          }
-        });
+  loadStoredItems = async () => {
+    let path = `/TODO_ITEMS/${this.state.listOwner}/${this.state.listId}`;
+    console.log(path)
+    firebase.database().ref(path).once('value').then(snapshot => {
+      if (snapshot.val()) {
+        console.log('got db list data', snapshot.val());
+        this.assignItems(Object.values(snapshot.val()));
       }
     }).catch(err => console.log(err));
   };
@@ -89,7 +83,7 @@ export default class ActiveListScreen extends React.Component {
         ...item,
         order: (idx + 1) * 100
       }));
-      this.storeItems(list);
+      this.storeItemsAll(list);
     }
     this.setState({
       items: list
@@ -98,12 +92,11 @@ export default class ActiveListScreen extends React.Component {
 
   notOrdered = (list) => list.some(it => it.order === undefined)
 
-  storeItems = (list) => {
+  storeItemsAll = (list) => {
     if (list === undefined) {
       list = this.state.items
     }
-    firebase.database().ref('TODO_ITEMS/' + this.state.listOwner + '/' + this.state.listId).set(list);
-    return AsyncStorage.setItem(this.listKey(), JSON.stringify(list));
+    return firebase.database().ref('TODO_ITEMS/' + this.state.listOwner + '/' + this.state.listId).set(list);
   };
 
   toggleShowDoneItems = () => {
@@ -127,41 +120,48 @@ export default class ActiveListScreen extends React.Component {
     }, () => {
       console.log("the item was removed")
       this.isDeleting = false;
-      this.storeItems();
+      this.updateItemDb(key, null);
     });
   };
 
+  updateItemDb = (key, value) =>
+    firebase.database().ref(`TODO_ITEMS/${this.state.listOwner}/${this.state.listId}/${key}`).set(value);
+
   updateItem = (key, apply) => {
+
     this.setState(previousState => {
       return {
         items: previousState.items.map(item => {
           if (item.key === key) {
-            apply(item);
+            const changedItem = apply(item);
+            this.updateItemDb(key, changedItem);
+            return changedItem;
           }
           return item;
         })
       }
-    }, this.storeItems);
+    });
   };
 
   toggleItem = (key, isDone) => {
-    this.updateItem(key, (item) => item.done = isDone);
+    this.updateItem(key, item => ({ ...item, done: isDone }));
   };
 
   changeItemText = (key, value) => {
-    this.updateItem(key, (item) => item.text = value);
+    this.updateItem(key, item => ({ ...item, text: value }));
   };
 
   addItem = (newValue) => {
+    const newItem = {
+      key: new Date().getTime(),
+      text: newValue,
+      order: (previousState.items.length + 1) * 100,
+    };
     this.setState(previousState => {
       return {
-        items: previousState.items.concat([{
-          key: new Date().getTime(),
-          text: newValue,
-          order: (previousState.items.length + 1) * 100,
-        }])
+        items: previousState.items.concat([newItem])
       }
-    }, () => this.storeItems().then(() =>
+    }, () => this.updateItemDb(newItem.key, newItem).then(() =>
       setTimeout(this.scrollView.scrollToEnd, ANIMATION_DURATION)
     ));
   };
@@ -243,7 +243,7 @@ export default class ActiveListScreen extends React.Component {
 
       let newItemOrder = (prevOrder + nextOrder) / 2;
       item.order = newItemOrder;
-      this.updateItem(item.key, (item) => item.order = newItemOrder);
+      this.updateItem(item.key, item => ({ ...item, order: newItemOrder }));
     }
 
     return <SortableList
