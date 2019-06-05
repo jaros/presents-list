@@ -88,7 +88,10 @@ export default class ListsScreen extends React.Component {
           return updates;
         }
         const listContentParsed = JSON.parse(list).reduce((acc, cur) => {
-          acc[cur.key] = cur;
+          acc[cur.key] = { 
+            ...cur, 
+            owner: this.state.userid 
+          };
           return acc;
         }, {})
         updates[`/TODO_ITEMS/${this.state.userid}/${link.id}`] = listContentParsed;
@@ -254,6 +257,7 @@ export default class ListsScreen extends React.Component {
         id,
         label: listName,
         showDone: true,
+        owner: this.state.userid,
       }
       oldLinks.unshift(newList);
       return {
@@ -315,7 +319,7 @@ export default class ListsScreen extends React.Component {
   };
 
   navigateToActive = (link) => {
-    this.props.navigation.navigate('ActiveList', { name: link.label, id: link.id });
+    this.props.navigation.navigate('ActiveList', { name: link.label, id: link.id, listOwner: link.owner || this.state.userid });
   };
 }
 

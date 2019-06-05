@@ -41,10 +41,12 @@ export default class ActiveListScreen extends React.Component {
   constructor(props) {
     super(props);
     const listId = props.navigation.getParam('id', 'NO-ID');
+    const listOwner = props.navigation.getParam('listOwner', 'NO-OWNER');
     this.state = {
       items: [],
       currentList: { showDone: true }, // mock currentList - we don't save meta property here
       listId: listId,
+      listOwner: listOwner,
       isEdit: false,
       isSwiping: false,
       currentlyOpenSwipeable: null,
@@ -70,7 +72,7 @@ export default class ActiveListScreen extends React.Component {
       if (value) {
         this.assignItems(JSON.parse(value));
       } else {
-        firebase.database().ref(`/TODO_ITEMS/${this.state.userid}/${this.state.listId}`).once('value').then(snapshot => {
+        firebase.database().ref(`/TODO_ITEMS/${this.state.listOwner}/${this.state.listId}`).once('value').then(snapshot => {
           if (snapshot.val()) {
             this.assignItems(snapshot.val()); 
             this.storeItems(snapshot.val());
@@ -100,7 +102,7 @@ export default class ActiveListScreen extends React.Component {
     if (list === undefined) {
       list = this.state.items
     }
-    firebase.database().ref('TODO_ITEMS/' + this.state.userid + '/' + this.state.listId).set(list);
+    firebase.database().ref('TODO_ITEMS/' + this.state.listOwner + '/' + this.state.listId).set(list);
     return AsyncStorage.setItem(this.listKey(), JSON.stringify(list));
   };
 
