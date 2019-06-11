@@ -61,10 +61,6 @@ export default class ActiveListScreen extends React.Component {
     });
   }
 
-  listKey = () => {
-    return 'TODO_ITEMS_' + this.state.listId;
-  };
-
   loadStoredItems = async () => {
     let path = `/TODO_ITEMS/${this.state.listOwner}/${this.state.listId}`;
     console.log(path)

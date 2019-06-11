@@ -24,7 +24,7 @@ export default class RenameList extends React.Component {
               this.props.toggleShow();
             }}
             initValue={this.props.initValue}
-            saveLabel='Save'
+            saveLabel={this.props.buttonLabel || 'Save'}
             textInputPlaceholder='Provide a name for current list'
             autoFocus={this.props.autoFocus}
             multiline={true}

@@ -323,9 +323,13 @@ export default class ListsScreen extends React.Component {
 
 class ListItem extends React.Component {
 
+
   constructor(props) {
     super(props);
     this._animated = new Animated.Value(0);
+    this.state = {
+      shareViewVisible: false
+    };
   }
 
   componentDidMount() {
@@ -375,6 +379,21 @@ class ListItem extends React.Component {
     }
   };
 
+  toggleShareView = () => this.setState({ shareViewVisible: !this.state.shareViewVisible });
+
+  showShareView = () => this.setState({ shareViewVisible: true });
+
+  renderShare = () => (<View style={{ marginTop: 22 }}>
+    <RenameList
+      autoFocus={true}
+      onUpdate={() => console.log('modal closed', this.props.link.id)}
+      initValue={"type your friend email"}
+      show={this.state.shareViewVisible}
+      toggleShow={() => this.toggleShareView(!this.state.shareViewVisible)}
+      buttonLabel='Send'
+    />
+  </View>);
+
   render() {
     const { link, isActive, isEdit, onPressLink, toggleShowRenameList } = this.props;
     const rowStyles = [
@@ -418,16 +437,7 @@ class ListItem extends React.Component {
               <ActionIcon
                 icon='ios-paper-plane'
                 color='#1284f7'
-                click={async () => {
-                  Share.share(
-                    {
-                      title: `Share a list ${link.label} with friend`,
-                      message: await this.getListContent(link.id)
-                    }, {
-                      subject: `Content of '${link.label}'`
-                    }
-                  );
-                }}
+                click={this.showShareView}
               />
             </View>
             <View style={styles.optionIconContainer}>
@@ -436,6 +446,7 @@ class ListItem extends React.Component {
                 click={() => toggleShowRenameList(link.id)}
                 color='#1284f7'
               />
+            {this.renderShare()}
             </View>
             <View style={styles.optionIconContainer}>
               <ActionIcon
