@@ -6,16 +6,7 @@ import { ANIMATION_DURATION } from '../constants/Layout';
 import { ActionIcon } from '../components/TodoItem';
 import RenameList from '../components/RenameList';
 import * as firebase from 'firebase';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDmELLjEJAx5hxcYphFGD3821WVSOTIsWw",
-  authDomain: "check-tasks.firebaseapp.com",
-  databaseURL: "https://check-tasks.firebaseio.com",
-  projectId: "check-tasks",
-  storageBucket: "check-tasks.appspot.com",
-  messagingSenderId: "806572063767",
-  appId: "1:806572063767:web:899014c783991a75"
-};
+import { firebaseConfig } from '../constants/config';
 
 firebase.initializeApp(firebaseConfig);
 
@@ -237,17 +228,9 @@ export default class ListsScreen extends React.Component {
 
   updateShared = (listId, email) => {
     const metaList = this.state.metaList;
-    const list = metaList.links[listId];
-    let sharedWith = list.sharing;
-    if (sharedWith) {
-      sharedWith.push(email);
-    } else {
-      sharedWith = [email];
-    }
-    console.log('sharedWith', sharedWith);
-    metaList.links[listId].sharing = sharedWith;
+    metaList.links[listId].sharing = email;
     this.setState({ metaList });
-    return firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid + '/links/' + listId + '/sharing').set(sharedWith);
+    return firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid + '/links/' + listId + '/sharing').set(email);
   }
 
   doListDelete = id => this.setState(previousState => {
