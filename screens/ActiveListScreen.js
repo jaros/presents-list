@@ -151,7 +151,7 @@ export default class ActiveListScreen extends React.Component {
     const newItem = {
       key: new Date().getTime(),
       text: newValue,
-      order: (previousState.items.length + 1) * 100,
+      order: (this.state.items.length + 1) * 100,
     };
     this.setState(previousState => {
       return {

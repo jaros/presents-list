@@ -79,8 +79,16 @@ export default class ListsScreen extends React.Component {
     } else {
       const localData = await this.loadLocalMetaList();
       if (localData) {
-        this.setState({ metaList: localData });
-        firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(localData);
+        let mappedLocal = {
+          ...localData,
+          links: localData.links.reduce((acc, cur) => {
+            cur.owner = this.state.userid;
+            acc[cur.id] = cur;
+            return acc;
+          }, {})
+        };
+        this.setState({ metaList: mappedLocal });
+        firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(mappedLocal);
         // store all local lists to remote db - backward compatibility
         return await firebase.database().ref().update(await this.firebaseUpdates(localData));
       } else {
@@ -167,29 +175,30 @@ export default class ListsScreen extends React.Component {
   }
 
   activeList = () => {
-    return this.state.metaList.links.find(it => it.id === this.state.metaList.active);
+    return this.state.metaList.links[this.state.metaList.active];
   };
 
   editableListName = () => {
     if (this.state.editableList) {
-      const list = this.state.metaList.links.find(it => it.id === this.state.editableList);
+      const list = this.state.metaList.links[this.state.editableList];
       return list ? list.label : 'no list selected';
     } else {
-      return 'List ' + (this.state.metaList.links.length + 1);
+      return 'List ' + (Object.keys(this.state.metaList.links).length + 1);
     }
   };
 
   todoItemsMetaList = () => {
     const newId = this.generateId()
+    let links = {
+      [newId]: {
+        id: newId,
+        label: 'My list ONE',
+        showDone: true,
+      }
+    };
     return {
       active: newId,
-      links: [
-        {
-          id: newId,
-          label: 'My list ONE',
-          showDone: true,
-        }
-      ]
+      links
     }
   };
 
@@ -207,12 +216,13 @@ export default class ListsScreen extends React.Component {
 
   onListNameUpdate = (value) => {
     this.setState(previousState => {
-      const objIndex = previousState.metaList.links.findIndex((obj => obj.id == previousState.editableList));
-      previousState.metaList.links[objIndex].label = value;
+      let { metaList, editableList } = previousState;
+      //const objIndex = previousState.metaList.links.findIndex((obj => obj.id == previousState.editableList));
+      metaList.links[editableList].label = value;
       return {
         metaList: {
-          ...previousState.metaList,
-          links: previousState.metaList.links
+          ...metaList,
+          links: metaList.links
         }
       }
     }, this.saveMetaList);
@@ -225,12 +235,31 @@ export default class ListsScreen extends React.Component {
     return firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(metaList);
   };
 
+  updateShared = (listId, email) => {
+    const metaList = this.state.metaList;
+    const list = metaList.links[listId];
+    let sharedWith = list.sharing;
+    if (sharedWith) {
+      sharedWith.push(email);
+    } else {
+      sharedWith = [email];
+    }
+    console.log('sharedWith', sharedWith);
+    metaList.links[listId].sharing = sharedWith;
+    this.setState({ metaList });
+    return firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid + '/links/' + listId + '/sharing').set(sharedWith);
+  }
+
   doListDelete = id => this.setState(previousState => {
-    const links = previousState.metaList.links.filter(obj => obj.id !== id);
+    console.log('deleting', id);
+    let links = previousState.metaList.links;
+    delete links[id];// previousState.metaList.links.filter(obj => obj.id !== id);
+
+    console.log('after deleting', links);
 
     const active = id !== previousState.metaList.active
       ? previousState.metaList.active // remain current active
-      : links.length !== 0 ? links[0].id : -1; // take  first from the rest
+      : Object.keys(links).length !== 0 ? Object.values(links)[0].id : -1; // take  first from the rest
     return {
       metaList: {
         active: active,
@@ -238,11 +267,11 @@ export default class ListsScreen extends React.Component {
       }
     }
   }, () => {
-    firebase.database().ref('TODO_ITEMS/' + this.state.userid + '/' + id).set(null);
-    if (this.state.metaList.links.length === 0) {
+    if (Object.keys(this.state.metaList.links).length === 0) {
       this.initFirstTime()
     } else {
-      this.saveMetaList();
+      firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid + '/links/' + id).set(null);
+      firebase.database().ref('TODO_ITEMS/' + this.state.userid + '/' + id).set(null);
     }
   });
 
@@ -257,10 +286,12 @@ export default class ListsScreen extends React.Component {
         showDone: true,
         owner: this.state.userid,
       }
-      oldLinks.unshift(newList);
       return {
         metaList: {
-          links: oldLinks,
+          links: {
+            ...oldLinks,
+            [id]: newList
+          },
           active: newList.id
         }
       };
@@ -283,7 +314,7 @@ export default class ListsScreen extends React.Component {
         <ScrollView
           style={styles.container}
           keyboardShouldPersistTaps='always'>
-          {this.state.metaList.links.map(link =>
+          {Object.values(this.state.metaList.links).sort((a, b) => a.id - b.id).map(link =>
             <ListItem
               key={link.id}
               link={link}
@@ -291,6 +322,7 @@ export default class ListsScreen extends React.Component {
               isEdit={this.state.edit}
               onPressLink={this._handlePressListLink}
               toggleShowRenameList={this.toggleShowRenameList}
+              updateShared={this.updateShared}
               doListDelete={this.doListDelete} />
           )}
         </ScrollView>
@@ -386,8 +418,11 @@ class ListItem extends React.Component {
   renderShare = () => (<View style={{ marginTop: 22 }}>
     <RenameList
       autoFocus={true}
-      onUpdate={() => console.log('modal closed', this.props.link.id)}
-      initValue={"type your friend email"}
+      onUpdate={(email) => {
+        console.log('modal closed', this.props.link.id);
+        this.props.updateShared(this.props.link.id, email);
+      }}
+      initValue={"email"}
       show={this.state.shareViewVisible}
       toggleShow={() => this.toggleShareView(!this.state.shareViewVisible)}
       buttonLabel='Send'
@@ -446,7 +481,7 @@ class ListItem extends React.Component {
                 click={() => toggleShowRenameList(link.id)}
                 color='#1284f7'
               />
-            {this.renderShare()}
+              {this.renderShare()}
             </View>
             <View style={styles.optionIconContainer}>
               <ActionIcon
