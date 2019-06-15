@@ -457,10 +457,10 @@ class ListItem extends React.Component {
           </View>
         </TouchableOpacity>
         {isEdit &&
-          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
             <View style={styles.optionIconContainer}>
               <ActionIcon
-                icon='ios-paper-plane'
+                icon='ios-send'
                 color='#1284f7'
                 click={this.showShareView}
               />
@@ -471,7 +471,7 @@ class ListItem extends React.Component {
                 click={() => toggleShowRenameList(link.id)}
                 color='#1284f7'
               />
-              {this.renderShare()}
+              {this.state.shareViewVisible && this.renderShare()}
             </View>
             <View style={styles.optionIconContainer}>
               <ActionIcon
