@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, Alert, AsyncStorage, Button, StyleSheet, Text, View, Platform, TouchableOpacity, Share, ScrollView } from 'react-native';
+import { ActivityIndicator, Animated, Alert, AsyncStorage, Button, StyleSheet, Text, View, Platform, TouchableOpacity, Share, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
 import { ANIMATION_DURATION } from '../constants/Layout';
@@ -57,6 +57,7 @@ export default class ListsScreen extends React.Component {
       editableList: 0,
       showRenameList: false,
       userid: firebase.auth().currentUser.uid,
+      loading: true
     };
 
     this.loadAndSyncronizeMetaList();
@@ -66,7 +67,7 @@ export default class ListsScreen extends React.Component {
 
     const metaList = await this.loadRemoteMetaList();
     if (metaList) {
-      this.setState({ metaList });
+      this.setState({ metaList, loading: false });
     } else {
       const localData = await this.loadLocalMetaList();
       if (localData) {
@@ -78,7 +79,7 @@ export default class ListsScreen extends React.Component {
             return acc;
           }, {})
         };
-        this.setState({ metaList: mappedLocal });
+        this.setState({ metaList: mappedLocal, loading: false });
         firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(mappedLocal);
         // store all local lists to remote db - backward compatibility
         return await firebase.database().ref().update(await this.firebaseUpdates(localData));
@@ -147,7 +148,7 @@ export default class ListsScreen extends React.Component {
 
   initFirstTime = () => {
     const metaList = this.todoItemsMetaList();
-    this.setState({ metaList });
+    this.setState({ metaList, loading: false });
     return this.saveMetaList(metaList);
   }
 
@@ -291,33 +292,39 @@ export default class ListsScreen extends React.Component {
     this.props.navigation.setParams({ headerRightBtnLabel: isEdit ? "Done" : "Edit" });
   }
 
+  renderLists = () => (
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        keyboardShouldPersistTaps='always'>
+        {Object.values(this.state.metaList.links).sort((a, b) => a.id - b.id).map(link =>
+          <ListItem
+            key={link.id}
+            link={link}
+            isActive={link.id == this.state.metaList.active}
+            isEdit={this.state.edit}
+            onPressLink={this._handlePressListLink}
+            toggleShowRenameList={this.toggleShowRenameList}
+            updateShared={this.updateShared}
+            doListDelete={this.doListDelete} />
+        )}
+      </ScrollView>
+      <RenameList
+        autoFocus={true}
+        onUpdate={this.state.editableList ? this.onListNameUpdate : this.addNewList}
+        initValue={this.editableListName}
+        show={this.state.showRenameList}
+        toggleShow={this.toggleShowRenameList}
+      />
+    </View>
+  );
+
   render() {
-    return (
-      <View style={styles.container}>
-        <ScrollView
-          style={styles.container}
-          keyboardShouldPersistTaps='always'>
-          {Object.values(this.state.metaList.links).sort((a, b) => a.id - b.id).map(link =>
-            <ListItem
-              key={link.id}
-              link={link}
-              isActive={link.id == this.state.metaList.active}
-              isEdit={this.state.edit}
-              onPressLink={this._handlePressListLink}
-              toggleShowRenameList={this.toggleShowRenameList}
-              updateShared={this.updateShared}
-              doListDelete={this.doListDelete} />
-          )}
-        </ScrollView>
-        <RenameList
-          autoFocus={true}
-          onUpdate={this.state.editableList ? this.onListNameUpdate : this.addNewList}
-          initValue={this.editableListName}
-          show={this.state.showRenameList}
-          toggleShow={this.toggleShowRenameList}
-        />
-      </View>
-    );
+    if (this.state.loading) {
+      return (<View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color="#0000ff" hidesWhenStopped={true} animating={true} />
+      </View>)
+    } else return this.renderLists();
   }
 
   _handlePressListLink = (link) => () => {
