@@ -36,6 +36,7 @@ export default class TextEdit extends React.Component {
             borderColor: Colors.logoLightColor,
           }}>
           <TextInput
+             keyboardType={this.props.keyboardType || "default"}
              value={this.state.text}
              clearButtonMode='while-editing'
              selectTextOnFocus={false}

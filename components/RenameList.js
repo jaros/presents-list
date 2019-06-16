@@ -10,14 +10,14 @@ export default class RenameList extends React.Component {
   }
 
   render() {
-    return(
+    return (
       <Modal
         animationType='slide'
         transparent={false}
         visible={this.props.show}
         presentationStyle='pageSheet'
-        >
-        <View style={{marginTop: 60}}>
+      >
+        <View style={{ marginTop: 60 }}>
           <TextEdit
             onSave={(value) => {
               this.props.onUpdate(value);
@@ -28,6 +28,7 @@ export default class RenameList extends React.Component {
             textInputPlaceholder={this.props.buttonLabel === 'Send' ? 'Email' : 'Provide a name for current list'}
             autoFocus={this.props.autoFocus}
             multiline={true}
+            keyboardType={this.props.buttonLabel === 'Send' ? "email-address" : "default"}
           />
           <View>
             <Button
@@ -35,7 +36,7 @@ export default class RenameList extends React.Component {
                 this.props.toggleShow();
               }}
               title='Cancel'
-              >
+            >
             </Button>
           </View>
         </View>

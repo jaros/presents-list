@@ -2,11 +2,12 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const config = require('./config');
 
-
 exports.shareList = functions.database.ref('/TODO_ITEMS_META_LIST/{owner}/links/{listId}/sharing')
   .onWrite(async (snapshot, context) => {
     const dataBefore = snapshot.before.val();
     const dataAfter = snapshot.after.val();
+    console.log('dataBefore', dataBefore, 'dataAfter', dataAfter);
+
     const { owner, listId } = context.params;
 
     console.log('new sharing for', listId, 'by', owner);
@@ -18,6 +19,10 @@ exports.shareList = functions.database.ref('/TODO_ITEMS_META_LIST/{owner}/links/
     const app = admin.initializeApp(appOptions, 'app');
     const deleteApp = () => app.delete().catch(() => null);
 
+    if (dataBefore) {
+      // TODO remove previous sharing - only one peer per time
+    }
+
     const labelSnap = await app.database().ref('TODO_ITEMS_META_LIST/' + owner + '/links/' + listId + '/label').once('value');
 
     const label = labelSnap.val();
@@ -27,7 +32,7 @@ exports.shareList = functions.database.ref('/TODO_ITEMS_META_LIST/{owner}/links/
 
     try {
       const userRecord = await app.auth().getUserByEmail(dataAfter);
-      const uid = userRecord.getUid();
+      const uid = userRecord.uid;
 
       await app.database().ref('TODO_ITEMS_META_LIST/' + uid + '/links/' + listId).set({
         id: listId,
@@ -37,13 +42,7 @@ exports.shareList = functions.database.ref('/TODO_ITEMS_META_LIST/{owner}/links/
       });
       return deleteApp();
     } catch (err) {
-      console.log('user not found', dataAfter);
+      console.log('user not found', dataAfter, err);
       return deleteApp();
     }
-
-    //return snapshot.ref.parent.child('uppercase').set(uppercase);
-
-    // You must return a Promise when performing asynchronous tasks inside a Functions such as
-    // writing to the Firebase Realtime Database.
-    // Setting an "uppercase" sibling in the Realtime Database returns a Promise.
   });

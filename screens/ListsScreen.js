@@ -412,7 +412,7 @@ class ListItem extends React.Component {
         console.log('modal closed', this.props.link.id);
         this.props.updateShared(this.props.link.id, email);
       }}
-      initValue={"email"}
+      initValue={"judin.jaroslav@gmail.com"}
       show={this.state.shareViewVisible}
       toggleShow={() => this.toggleShareView(!this.state.shareViewVisible)}
       buttonLabel='Send'
@@ -456,7 +456,7 @@ class ListItem extends React.Component {
             </View>
           </View>
         </TouchableOpacity>
-        {isEdit &&
+        {isEdit && !link.readonly &&
           <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
             <View style={styles.optionIconContainer}>
               <ActionIcon
