@@ -490,6 +490,26 @@ class ListItem extends React.Component {
             </View>
           </View>
         }
+        {link.sharing &&
+          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <View style={styles.optionIconContainer}>
+              <ActionIcon
+                icon='ios-contacts'
+                color='#1284f7'
+                click={() => {
+                  Alert.alert(
+                    'Shared list',
+                    'Shared with ' + link.sharing,
+                    [
+                      {text: 'OK', onPress: () => console.log('OK Pressed')},
+                    ],
+                    {cancelable: false},
+                  );
+                }}
+              />
+            </View>
+          </View>
+        }
       </Animated.View>
     )
   }
