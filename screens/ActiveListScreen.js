@@ -61,15 +61,18 @@ export default class ActiveListScreen extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    this.itemsListener.off();
+  }
+
   loadStoredItems = async () => {
-    let path = `/TODO_ITEMS/${this.state.listOwner}/${this.state.listId}`;
-    console.log(path)
-    firebase.database().ref(path).once('value').then(snapshot => {
+    this.itemsListener = firebase.database().ref(`/TODO_ITEMS/${this.state.listOwner}/${this.state.listId}`);
+    this.itemsListener.on('value', snapshot => {
       if (snapshot.val()) {
         console.log('got db list data', snapshot.val());
         this.assignItems(Object.values(snapshot.val()));
       }
-    }).catch(err => console.log(err));
+    }, err => console.log(err));
   };
 
   assignItems = list => {
@@ -107,17 +110,7 @@ export default class ActiveListScreen extends React.Component {
       return; // already deleted
     }
     console.log('deleting item')
-    this.isDeleting = true;
-    this.setState(previousState => {
-      return {
-        items: previousState.items.filter(item => item.key !== key),
-        currentlyOpenSwipeable: null,
-      }
-    }, () => {
-      console.log("the item was removed")
-      this.isDeleting = false;
-      this.updateItemDb(key, null);
-    });
+    this.updateItemDb(key, null);
   };
 
   updateItemDb = (key, value) =>
@@ -125,18 +118,10 @@ export default class ActiveListScreen extends React.Component {
 
   updateItem = (key, apply) => {
 
-    this.setState(previousState => {
-      return {
-        items: previousState.items.map(item => {
-          if (item.key === key) {
-            const changedItem = apply(item);
-            this.updateItemDb(key, changedItem);
-            return changedItem;
-          }
-          return item;
-        })
-      }
-    });
+    let item = this.state.items.find(item => item.key === key);
+
+    const changedItem = apply(item);
+    this.updateItemDb(key, changedItem);
   };
 
   toggleItem = (key, isDone) => {
@@ -186,6 +171,19 @@ export default class ActiveListScreen extends React.Component {
       onSwipeStart: this.onSwipeStart,
       onSwipeRelease: this.onSwipeRelease,
     };
+    const itemsToShow = this.state.items
+      .filter(item => !item.done || this.state.currentList.showDone)
+      .sort(function (obj1, obj2) {
+        // Ascending
+        return obj1.order - obj2.order;
+      });
+    const todos = itemsToShow.map(item =>
+      <TodoItem key={item.key}
+        item={item}
+        {...itemProps}
+      />
+    );
+    console.log('rerendering', itemsToShow);
     return <ScrollView
       showsVerticalScrollIndicator={false}
       scrollEventThrottle={16}
@@ -200,18 +198,7 @@ export default class ActiveListScreen extends React.Component {
       <View style={styles.listContainer}>
 
         {
-          this.state.items
-            .filter(item => !item.done || this.state.currentList.showDone)
-            .sort(function (obj1, obj2) {
-              // Ascending
-              return obj1.order - obj2.order;
-            })
-            .map(item =>
-              <TodoItem key={item.key}
-                item={item}
-                {...itemProps}
-              />
-            )
+          todos
         }
 
         {

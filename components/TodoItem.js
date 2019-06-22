@@ -43,13 +43,15 @@ export default class TodoItem extends React.Component {
     };
   }
 
+  static getDerivedStateFromProps(props, state) {
+    return {
+      done: props.item.done
+    };
+  }
+
   toggleDone = () => {
     Haptic.impact('light');
-    this.setState(previousState => {
-      return { done: !previousState.done }
-    }, () => {
-      this.props.onDone(this.props.item.key, this.state.done);
-    })
+    this.props.onDone(this.props.item.key, !this.state.done);
   }
 
   textStyle() {

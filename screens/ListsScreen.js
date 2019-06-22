@@ -294,6 +294,7 @@ export default class ListsScreen extends React.Component {
 
   renderLists = () => (
     <View style={styles.container}>
+      {this.renderUserName()}
       <ScrollView
         style={styles.container}
         keyboardShouldPersistTaps='always'>
@@ -318,6 +319,11 @@ export default class ListsScreen extends React.Component {
       />
     </View>
   );
+
+  renderUserName = () => {
+    const name = firebase.auth().currentUser.email;
+    return (<View style={{padding:10, display: 'flex', alignSelf: 'flex-end'}}><Text>{name}</Text></View>)
+  }
 
   render() {
     if (this.state.loading) {
