@@ -262,7 +262,7 @@ export default class ListsScreen extends React.Component {
   addNewList = (listName) => {
     const id = this.generateId();
     this.setState(previousState => {
-      oldLinks = previousState.metaList.links;
+      let oldLinks = previousState.metaList.links;
       // TODO: store userId in list details => requires registration
       let newList = {
         id,
@@ -302,7 +302,7 @@ export default class ListsScreen extends React.Component {
           <ListItem
             key={link.id}
             link={link}
-            isActive={link.id == this.state.metaList.active}
+            isActive={link.id === this.state.metaList.active}
             isEdit={this.state.edit}
             onPressLink={this._handlePressListLink}
             toggleShowRenameList={this.toggleShowRenameList}
@@ -501,7 +501,15 @@ class ListItem extends React.Component {
                     'Shared list',
                     'Shared with ' + link.sharing,
                     [
-                      {text: 'OK', onPress: () => console.log('OK Pressed')},
+                      {
+                        text: 'Stop sharing',
+                        onPress: () => {
+                          console.log('stop sharing action');
+                          this.props.updateShared(this.props.link.id, null);
+                        },
+                        style: 'destructive'
+                      },
+                      {text: 'Cancel', onPress: () => console.log('OK Pressed'), style: 'cancel'},
                     ],
                     {cancelable: false},
                   );
