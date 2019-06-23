@@ -1,17 +1,29 @@
 import React from 'react';
-import { ActivityIndicator, Animated, Alert, AsyncStorage, Button, StyleSheet, Text, View, Platform, TouchableOpacity, Share, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import {
+  ActivityIndicator,
+  Alert,
+  Animated,
+  AsyncStorage,
+  Button,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import {Ionicons} from '@expo/vector-icons';
 import Colors from '../constants/Colors';
-import { ANIMATION_DURATION } from '../constants/Layout';
-import { ActionIcon } from '../components/TodoItem';
+import {ANIMATION_DURATION} from '../constants/Layout';
+import {ActionIcon} from '../components/TodoItem';
 import RenameList from '../components/RenameList';
 import * as firebase from 'firebase';
-import { firebaseConfig } from '../constants/config';
+import {firebaseConfig} from '../constants/config';
 
 firebase.initializeApp(firebaseConfig);
 
 export default class ListsScreen extends React.Component {
-  static navigationOptions = ({ navigation }) => {
+  static navigationOptions = ({navigation}) => {
     return {
       // header: null,
       title: 'Lists',
@@ -24,13 +36,13 @@ export default class ListsScreen extends React.Component {
         <TouchableOpacity
           background={'#66ff40'}
           onPress={() => navigation.getParam('optionalAddNewlist')()}>
-          <View style={[styles.optionIconContainer, { paddingLeft: 15 }]}>
-            <Ionicons name="ios-add" size={35} color={Colors.iosDefault} />
+          <View style={[styles.optionIconContainer, {paddingLeft: 15}]}>
+            <Ionicons name="ios-add" size={35} color={Colors.iosDefault}/>
           </View>
         </TouchableOpacity>
       ),
       headerRight: (
-        <View style={{ paddingRight: 10, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{paddingRight: 10, flexDirection: 'row', alignItems: 'center'}}>
           <Button
             onPress={() => navigation.getParam('toggleEditAction')()}
             title={"" + navigation.getParam('headerRightBtnLabel', '')}
@@ -40,8 +52,8 @@ export default class ListsScreen extends React.Component {
             onPress={() =>
               firebase.auth().signOut().then(() => console.log('signed out')).catch(error => console.log(error))
             }>
-            <View style={[styles.optionIconContainer, { paddingLeft: 15 }]}>
-              <Ionicons name="ios-log-out" size={28} color={Colors.iosDefault} />
+            <View style={[styles.optionIconContainer, {paddingLeft: 15}]}>
+              <Ionicons name="ios-log-out" size={28} color={Colors.iosDefault}/>
             </View>
           </TouchableOpacity>
         </View>
@@ -67,7 +79,7 @@ export default class ListsScreen extends React.Component {
 
     const metaList = await this.loadRemoteMetaList();
     if (metaList) {
-      this.setState({ metaList, loading: false });
+      this.setState({metaList, loading: false});
     } else {
       const localData = await this.loadLocalMetaList();
       if (localData) {
@@ -79,7 +91,7 @@ export default class ListsScreen extends React.Component {
             return acc;
           }, {})
         };
-        this.setState({ metaList: mappedLocal, loading: false });
+        this.setState({metaList: mappedLocal, loading: false});
         firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid).set(mappedLocal);
         // store all local lists to remote db - backward compatibility
         return await firebase.database().ref().update(await this.firebaseUpdates(localData));
@@ -137,18 +149,17 @@ export default class ListsScreen extends React.Component {
           this.initFirstTime();
         } else {
           console.log("meta list data: " + metaList);
-          this.setState({ metaList });
+          this.setState({metaList});
         }
       });
-    }
-    catch (err) {
+    } catch (err) {
       return console.log(err);
     }
   };
 
   initFirstTime = () => {
     const metaList = this.todoItemsMetaList();
-    this.setState({ metaList, loading: false });
+    this.setState({metaList, loading: false});
     return this.saveMetaList(metaList);
   }
 
@@ -208,7 +219,7 @@ export default class ListsScreen extends React.Component {
 
   onListNameUpdate = (value) => {
     this.setState(previousState => {
-      let { metaList, editableList } = previousState;
+      let {metaList, editableList} = previousState;
       //const objIndex = previousState.metaList.links.findIndex((obj => obj.id == previousState.editableList));
       metaList.links[editableList].label = value;
       return {
@@ -230,7 +241,7 @@ export default class ListsScreen extends React.Component {
   updateShared = (listId, email) => {
     const metaList = this.state.metaList;
     metaList.links[listId].sharing = email;
-    this.setState({ metaList });
+    this.setState({metaList});
     return firebase.database().ref('TODO_ITEMS_META_LIST/' + this.state.userid + '/links/' + listId + '/sharing').set(email);
   }
 
@@ -288,8 +299,8 @@ export default class ListsScreen extends React.Component {
 
   toggleEditButton = () => {
     const isEdit = !this.state.edit
-    this.setState({ edit: isEdit });
-    this.props.navigation.setParams({ headerRightBtnLabel: isEdit ? "Done" : "Edit" });
+    this.setState({edit: isEdit});
+    this.props.navigation.setParams({headerRightBtnLabel: isEdit ? "Done" : "Edit"});
   }
 
   renderLists = () => (
@@ -307,7 +318,7 @@ export default class ListsScreen extends React.Component {
             onPressLink={this._handlePressListLink}
             toggleShowRenameList={this.toggleShowRenameList}
             updateShared={this.updateShared}
-            doListDelete={this.doListDelete} />
+            doListDelete={this.doListDelete}/>
         )}
       </ScrollView>
       <RenameList
@@ -322,13 +333,13 @@ export default class ListsScreen extends React.Component {
 
   renderUserName = () => {
     const name = firebase.auth().currentUser.email;
-    return (<View style={{padding:10, display: 'flex', alignSelf: 'flex-end'}}><Text>{name}</Text></View>)
+    return (<View style={{padding: 10, display: 'flex', alignSelf: 'flex-end'}}><Text>{name}</Text></View>)
   }
 
   render() {
     if (this.state.loading) {
-      return (<View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
-        <ActivityIndicator size="large" color="#0000ff" hidesWhenStopped={true} animating={true} />
+      return (<View style={[styles.container, {alignItems: 'center', justifyContent: 'center'}]}>
+        <ActivityIndicator size="large" color="#0000ff" hidesWhenStopped={true} animating={true}/>
       </View>)
     } else return this.renderLists();
   }
@@ -345,7 +356,11 @@ export default class ListsScreen extends React.Component {
   };
 
   navigateToActive = (link) => {
-    this.props.navigation.navigate('ActiveList', { name: link.label, id: link.id, listOwner: link.owner || this.state.userid });
+    this.props.navigation.navigate('ActiveList', {
+      name: link.label,
+      id: link.id,
+      listOwner: link.owner || this.state.userid
+    });
   };
 }
 
@@ -386,39 +401,20 @@ class ListItem extends React.Component {
         type: 'cancel'
       }]
     );
-  }
-
-  loadListDetails = async () =>
-    (await firebase.database().ref('TODO_ITEMS/' + firebase.auth().currentUser.uid + '/' + listId).once('value')).val();
-
-  getListContent = async (listId) => {
-    const itemsToList = items => {
-      if (items) {
-        return "- " + JSON.parse(items).map(item => item.text).join("\n- ");
-      }
-      return 'empty list';
-    };
-
-    try {
-      return itemsToList(await this.loadListDetails());
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
   };
 
-  toggleShareView = () => this.setState({ shareViewVisible: !this.state.shareViewVisible });
+  toggleShareView = () => this.setState({shareViewVisible: !this.state.shareViewVisible});
 
-  showShareView = () => this.setState({ shareViewVisible: true });
+  showShareView = () => this.setState({shareViewVisible: true});
 
-  renderShare = () => (<View style={{ marginTop: 22 }}>
+  renderShare = () => (<View style={{marginTop: 22}}>
     <RenameList
       autoFocus={true}
       onUpdate={(email) => {
         console.log('modal closed', this.props.link.id);
         this.props.updateShared(this.props.link.id, email);
       }}
-      initValue={"judin.jaroslav@gmail.com"}
+      initValue={"email@gmail.com"}
       show={this.state.shareViewVisible}
       toggleShow={() => this.toggleShareView(!this.state.shareViewVisible)}
       buttonLabel='Send'
@@ -426,10 +422,10 @@ class ListItem extends React.Component {
   </View>);
 
   render() {
-    const { link, isActive, isEdit, onPressLink, toggleShowRenameList } = this.props;
+    const {link, isActive, isEdit, onPressLink, toggleShowRenameList} = this.props;
     const rowStyles = [
       styles.option,
-      { opacity: this._animated },
+      {opacity: this._animated},
       {
         height: this._animated.interpolate({
           inputRange: [0, 1],
@@ -448,12 +444,12 @@ class ListItem extends React.Component {
         style={rowStyles}>
         <TouchableOpacity
           background={'#ccc'}
-          style={{ flex: 1, overflow: 'hidden', }}
+          style={{flex: 1, overflow: 'hidden',}}
           onPress={onPressLink(link)}>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', paddingRight: 15 }}>
+          <View style={{flexDirection: 'row', alignItems: 'center', paddingRight: 15}}>
             <View style={styles.optionIconContainer}>
-              <Ionicons name="ios-list" size={22} color={isActive ? "#000" : "#ccc"} />
+              <Ionicons name="ios-list" size={22} color={isActive ? "#000" : "#ccc"}/>
             </View>
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionText}>
@@ -462,8 +458,10 @@ class ListItem extends React.Component {
             </View>
           </View>
         </TouchableOpacity>
-        {isEdit && !link.readonly &&
-          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+
+        <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end'}}>
+          {isEdit && !link.readonly &&
+          <>
             <View style={styles.optionIconContainer}>
               <ActionIcon
                 icon='ios-send'
@@ -486,38 +484,37 @@ class ListItem extends React.Component {
                   console.log('delete a list', link.id);
                   this.askDelete(link.id);
                 }}
-                color='#ff3b30' />
+                color='#ff3b30'/>
             </View>
-          </View>
-        }
-        {link.sharing &&
-          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <View style={styles.optionIconContainer}>
-              <ActionIcon
-                icon='ios-contacts'
-                color='#1284f7'
-                click={() => {
-                  Alert.alert(
-                    'Shared list',
-                    'Shared with ' + link.sharing,
-                    [
-                      {
-                        text: 'Stop sharing',
-                        onPress: () => {
-                          console.log('stop sharing action');
-                          this.props.updateShared(this.props.link.id, null);
-                        },
-                        style: 'destructive'
+          </>
+          }
+          {link.sharing && !isEdit &&
+          <View style={styles.optionIconContainer}>
+            <ActionIcon
+              icon='ios-contacts'
+              color='#1284f7'
+              click={() => {
+                Alert.alert(
+                  'Shared list',
+                  'Shared with ' + link.sharing,
+                  [
+                    {
+                      text: 'Stop sharing',
+                      onPress: () => {
+                        console.log('stop sharing action');
+                        this.props.updateShared(this.props.link.id, null);
                       },
-                      {text: 'Cancel', onPress: () => console.log('OK Pressed'), style: 'cancel'},
-                    ],
-                    {cancelable: false},
-                  );
-                }}
-              />
-            </View>
+                      style: 'destructive'
+                    },
+                    {text: 'Cancel', onPress: () => console.log('OK Pressed'), style: 'cancel'},
+                  ],
+                  {cancelable: false},
+                );
+              }}
+            />
           </View>
-        }
+          }
+        </View>
       </Animated.View>
     )
   }
@@ -549,7 +546,7 @@ const styles = StyleSheet.create({
         width: window.width - 30 * 2,
         shadowColor: 'rgba(0,0,0,0.2)',
         shadowOpacity: 1,
-        shadowOffset: { height: 2, width: 2 },
+        shadowOffset: {height: 2, width: 2},
         shadowRadius: 2,
       },
 
